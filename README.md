@@ -1,4 +1,7 @@
-# HIRO SEGAWA — a cinematic music player
+# HIRO SEGAWA — Sakura Dream
+
+**A cinematic anime music player: cherry blossoms falling over a violet moon, eight night themes,
+and a real audio engine.**
 
 A complete, working music player for the web: midnight-city art direction, real HTML5 audio
 playback that survives navigation, Web Audio visualisation, local file import, playlists,
@@ -8,6 +11,9 @@ Built with **React 19 + TypeScript + Vite**, **Tailwind CSS**, **Web Audio API**
 (via `idb`), **LocalStorage** and **Lucide** icons, and shipped as an installable **PWA**.
 
 > **Live demo:** <https://devkazzu.github.io/music-player/> (PWA — installable from Chrome on Android)
+>
+> Every screen is layered over a live Sakura particle field, a custom-drawn moon-and-torii night
+> scene, and a theme system that recolours the sky, petals, glows and controls instantly.
 >
 > All nine demo tracks and every piece of artwork are original assets created for this project —
 > the audio is synthesised procedurally (`npm run gen:audio`), the artwork was generated for the
@@ -37,6 +43,7 @@ npm test           # vitest run — 58 tests, 8 files
 npm run test:watch # watch mode
 npm run lint       # tsc -b --force (full re-check)
 npm run gen:audio  # regenerate the demo MP3s (deterministic)
+npm run gen:icons  # rebuild PWA icons from the fox artwork
 
 # deployment / packaging
 npm run check:pwa    # audit the built dist/ for PWA installability
@@ -76,6 +83,33 @@ Mobile is a single column with a compact top bar, bottom navigation, a mini-play
 expandable full-screen player (safe-area aware, tested down to small Android widths).
 
 ---
+
+## Sakura Dream atmosphere
+
+- **Petal engine** (`src/components/atmosphere/SakuraField.tsx`) — one Canvas 2D loop, two depth
+  planes (soft distant petals behind the UI, sparse large petals in front), gravity plus a slowly
+  varying wind field, per-petal rotation/sway/alpha, pre-rendered blossom sprites, drifting light
+  motes and occasional glow sparkles. Petals never repeat in lockstep, fade in and out at the
+  edges, and keep falling across navigation because the canvases mount above the router.
+- **Cinematic night scene** (`CinematicBackdrop.tsx`) — individual SVG/CSS layers: gradient sky,
+  twinkling stars, craters-and-halo moon, mountain ridges, a torii gate (or pagoda / bamboo / koi
+  per theme), reflective lake with a moon reflection and ripples, traditional houses with lantern
+  windows, swaying blossom branches and drifting fog.
+- **Eight themes** (`src/lib/themes.ts`) — Sakura Night, Moonlight, Cyber Purple, Aqua Blue,
+  Sunset, Midnight, Koi Red, Emerald. A theme drives CSS custom properties (accent, glow, sky,
+  moon, ridges, lake, petals) plus its own scene composition; switching is instant and persisted.
+- **Controls** — petals on/off, intensity (gentle/normal/heavy), background animation, glow
+  intensity, motion preference, visualizer on/off + style, and a performance mode. Auto mode trims
+  the particle budget when the frame rate drops; the loop pauses while the tab is hidden and draws
+  a single static frame when the visitor prefers reduced motion. Mobile uses a smaller budget.
+- **Visualizers** — neon spectrum **bars**, smooth **waveform**, and a circular **aura** with
+  glowing kitsune ears, all driven by real `AnalyserNode` frequency data (with an honest
+  "ambient mode" label when audio analysis is unavailable).
+- **Typography** — Poppins (display), Manrope (body), Quicksand (UI details) and a glyph-subset of
+  Noto Sans JP (~55 kB for both weights) for the Japanese titles.
+
+Every theme, petal and glow setting lives in Settings → *Appearance* / *Sakura atmosphere* and is
+saved to LocalStorage.
 
 ## Playback
 
@@ -159,9 +193,12 @@ music-player/
 ├─ vercel.json                  SPA rewrites + asset headers for Vercel
 ├─ scripts/
 │  ├─ generate-audio.mjs        deterministic demo-score synthesiser → MP3
+│  ├─ make-icons.mjs            derives PWA icons + Apple touch icon from the fox artwork
 │  └─ check-pwa.mjs             manifest / icon / service-worker audit of dist/
 ├─ src/
+│  ├─ assets/fonts/             Noto Sans JP glyph subset (woff2)
 │  ├─ audio/engine.ts           HTMLAudioElement + Web Audio graph + subscriptions
+│  ├─ components/atmosphere/    SakuraField (canvas petals), CinematicBackdrop, SakuraLogo/FoxMark
 │  ├─ components/
 │  │  ├─ layout/                AppShell, Sidebar, TopBar, MobileNav
 │  │  ├─ player/                PlayerBar, QueuePanel, SeekBar, VolumeControl, Visualizer
@@ -169,8 +206,10 @@ music-player/
 │  │  ├─ cards/                 album / artist / playlist / track cards
 │  │  └─ ui/                    Modal, Menu, Slider, Cover, Skeletons, EmptyState, Particles, …
 │  ├─ data/catalog.ts           demo catalogue (tracks, artists, albums, playlists, moods)
+│  ├─ data/lyrics.ts            original lyric sheets per demo score
 │  ├─ hooks/                    keyboard shortcuts, page title, install prompt
 │  ├─ lib/
+│  │  ├─ themes.ts              eight theme palettes, scene composition, CSS variables
 │  │  ├─ db.ts                  IndexedDB schema + queries (audio blobs, playlists, history)
 │  │  ├─ metadata.ts            ID3/MP4/FLAC/Vorbis parsing, artwork, duration probing
 │  │  ├─ queue.ts               pure next-track / reorder / removal logic (unit tested)
@@ -211,7 +250,7 @@ Clearing site data resets the app; Settings offers explicit reset/erase actions 
 npm test
 ```
 
-67 tests across 9 files run in jsdom with `fake-indexeddb` and stubbed media APIs:
+88 tests across 12 files run in jsdom with `fake-indexeddb` and stubbed media APIs:
 
 - `tests/utils.test.ts` — formatting, slugify, clamping, uid, base-path asset resolution
 - `tests/deeplink.test.ts` — deep-link restoration used by the static-host `404.html` shim
@@ -221,7 +260,10 @@ npm test
 - `tests/queue.test.ts` — next-track selection (shuffle/repeat edge cases), index adjustment after
   removal and reorder
 - `tests/app.smoke.test.tsx` — splash → home → explore, search, playback from the hero, favourite
-  toggle, full-screen player, playlist creation
+  toggle, full-screen player, playlist creation, theme switching and atmosphere settings
+- `tests/themes.test.ts` — eight themes, palettes, CSS variables, petal colours, fallbacks
+- `tests/sakura.test.ts` — particle budget scaling, intensity presets and lyric coverage
+- `tests/settings.test.ts` — defaults, legacy `accent`/`aurora` migration, clamping, corrupted storage
 - `tests/player.test.tsx` — real playback state machine through the provider API: play/pause,
   absolute and relative seeking (including seeks before metadata loads), next/previous, queue
   mutation, persistence and favourites
@@ -305,5 +347,9 @@ the player falls back to a CSS-only animation with no functional loss.
 ## Credits
 
 Demo score composed and synthesised for this project by `scripts/generate-audio.mjs`
-(deterministic, no samples, encoded with a pure-JS LAME encoder). Artwork generated for this
-project. Fonts: Inter and Cormorant Garamond via Fontsource (SIL OFL). Icons: Lucide (ISC).
+(deterministic, no samples, encoded with a pure-JS LAME encoder). Key art, splash art, character
+artwork and the fox emblem were generated for this project with AI and are used only here; the
+eight night scenes are hand-built SVG/CSS layers, not wallpapers.
+
+Fonts: Poppins, Manrope, Quicksand and Noto Sans JP (subset) — all SIL OFL, self-hosted via
+Fontsource + `src/assets/fonts`. Icons: Lucide (ISC).

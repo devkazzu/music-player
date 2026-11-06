@@ -1,10 +1,9 @@
 import { useState } from 'react';
-import { NavLink, useNavigate } from 'react-router-dom';
+import { Link, NavLink, useNavigate } from 'react-router-dom';
 import {
   Clapperboard,
   Coffee,
   Compass,
-  Disc3,
   Heart,
   History,
   Home,
@@ -16,6 +15,7 @@ import {
   LibraryBig,
 } from 'lucide-react';
 import { PlaylistDialog } from '@/components/ui/PlaylistDialog';
+import { SakuraLogo } from '@/components/atmosphere/SakuraLogo';
 import { useLibrary } from '@/state/LibraryProvider';
 import { cn } from '@/lib/utils';
 
@@ -49,24 +49,13 @@ export function Sidebar({ className }: { className?: string }) {
   return (
     <aside
       className={cn(
-        'flex h-full w-[264px] shrink-0 flex-col border-r border-white/8 bg-[#060912]/70 backdrop-blur-2xl',
+        'chrome-side flex h-full w-[264px] shrink-0 flex-col border-r backdrop-blur-2xl',
         className,
       )}
     >
-      <div className="flex items-center gap-3 px-5 pb-5 pt-6">
-        <div className="relative grid size-10 shrink-0 place-items-center rounded-xl border border-white/12 bg-white/[0.04]">
-          <span
-            className="absolute inset-0 rounded-xl opacity-60 blur-md"
-            style={{ background: 'radial-gradient(circle at 30% 20%, var(--accent-soft), transparent 70%)' }}
-            aria-hidden
-          />
-          <Disc3 className="relative size-5 text-[var(--accent)]" aria-hidden />
-        </div>
-        <div className="min-w-0">
-          <p className="font-display text-[19px] leading-none tracking-wide text-white">HIRO SEGAWA</p>
-          <p className="jp mt-1 text-[9px] text-white/40">ヒロ・セガワ</p>
-        </div>
-      </div>
+      <Link to="/" className="block px-5 pb-5 pt-6" aria-label="HIRO SEGAWA — home">
+        <SakuraLogo />
+      </Link>
 
       <nav aria-label="Primary" className="min-h-0 flex-1 overflow-y-auto scroll-thin px-3 pb-4">
         <p className="eyebrow px-3 pb-2 pt-1">Discover</p>

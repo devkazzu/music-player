@@ -22,6 +22,7 @@ import {
   TriangleAlert,
 } from 'lucide-react';
 import { GENRE_BY_ID, MOOD_BY_ID } from '@/data/catalog';
+import { lyricsFor } from '@/data/lyrics';
 import { Cover } from '@/components/ui/Cover';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { LikeButton } from '@/components/ui/LikeButton';
@@ -51,6 +52,12 @@ export function NowPlayingPage() {
   const album = track ? getAlbum(track.albumId) : undefined;
   const artist = track ? getArtist(track.artistId) : undefined;
   const RepeatIcon = player.repeat === 'one' ? Repeat1 : Repeat;
+  const sheet = track ? lyricsFor(track.id) : null;
+  const lyricProgress =
+    player.duration > 0 ? Math.min(1, Math.max(0, player.currentTime / player.duration)) : 0;
+  const activeLyric = sheet && sheet.lines.length > 0
+    ? Math.min(sheet.lines.length - 1, Math.floor(lyricProgress * sheet.lines.length))
+    : -1;
   const canGoBack = typeof window !== 'undefined' && window.history.length > 1;
 
   useEffect(() => {
@@ -75,7 +82,7 @@ export function NowPlayingPage() {
 
   if (!track) {
     return (
-      <div className="grid h-full place-items-center bg-[#04050c] px-6">
+      <div className="grid h-full place-items-center px-6">
         <EmptyState
           icon={Music4}
           title="Nothing is playing"
@@ -96,17 +103,17 @@ export function NowPlayingPage() {
   }
 
   return (
-    <div className="relative h-full overflow-y-auto scroll-thin bg-[#04050c]">
+    <div className="relative h-full overflow-y-auto scroll-thin bg-[#0B0714]/55">
       {/* ---------------------------------------------------------- atmosphere */}
       <div className="pointer-events-none fixed inset-0 overflow-hidden" aria-hidden>
         <img
           key={track.cover}
           src={track.cover}
           alt=""
-          className="size-full scale-125 object-cover opacity-40 blur-[70px] transition-opacity duration-1000"
+          className="size-full scale-125 object-cover opacity-25 blur-[80px] transition-opacity duration-1000"
         />
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_50%_35%,transparent_0%,rgba(4,5,12,0.6)_55%,#04050c_100%)]" />
-        <div className="absolute inset-0 bg-gradient-to-b from-[#04050c]/40 via-transparent to-[#04050c]" />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_50%_35%,transparent_0%,rgba(11,7,20,0.55)_55%,#0B0714_100%)]" />
+        <div className="absolute inset-0 bg-gradient-to-b from-[#0B0714]/40 via-transparent to-[#0B0714]" />
         <Particles count={26} seed={7} tone="accent" />
       </div>
 
@@ -122,7 +129,7 @@ export function NowPlayingPage() {
             <ChevronDown className="size-5" aria-hidden />
           </button>
           <div className="min-w-0 flex-1 text-center">
-            <p className="eyebrow !text-[9px]">Now playing</p>
+            <p className="eyebrow !text-[9px]">Now playing · 再生中</p>
             <p className="truncate text-[12px] text-white/70">{player.contextLabel}</p>
           </div>
           <button
@@ -153,7 +160,7 @@ export function NowPlayingPage() {
               <div className="absolute inset-[38%] rounded-full border border-white/10 bg-white/[0.04]" />
             </div>
 
-            <div className="relative animate-[breathe_9s_ease-in-out_infinite]">
+            <div className="now-playing-glow relative animate-[breathe_11s_ease-in-out_infinite] rounded-[1.7rem]">
               <Cover
                 src={track.cover}
                 alt={`${track.album} artwork`}
@@ -163,6 +170,9 @@ export function NowPlayingPage() {
                 overlay
                 imgClassName="shadow-[0_30px_90px_-30px_rgba(0,0,0,0.9)]"
               />
+              <div className="pointer-events-none absolute -inset-8 -z-10 opacity-70">
+                <Particles count={16} seed={11} tone="accent" />
+              </div>
               <div className="absolute inset-x-0 bottom-0 flex items-end justify-between gap-2 p-4">
                 <div className="min-w-0">
                   <p className="jp text-[9px] text-white/50">再生中</p>
@@ -345,7 +355,13 @@ export function NowPlayingPage() {
             {/* visualizer */}
             {settings.visualizer ? (
               <div className="mt-5">
-                <div className="relative h-20 overflow-hidden rounded-2xl border border-white/8 bg-black/25 p-2 sm:h-24">
+                <div
+                  className={
+                    settings.visualizerStyle === 'aura'
+                      ? 'relative h-44 overflow-hidden rounded-2xl border border-[color:var(--hairline)] bg-black/20 p-2 sm:h-52'
+                      : 'relative h-20 overflow-hidden rounded-2xl border border-[color:var(--hairline)] bg-black/20 p-2 sm:h-24'
+                  }
+                >
                   <Visualizer variant={settings.visualizerStyle} className="size-full" />
                 </div>
                 <p className="mt-1.5 flex items-center gap-1.5 text-[10px] text-white/30">
@@ -450,6 +466,44 @@ export function NowPlayingPage() {
                 View full queue
               </button>
             </div>
+          </div>
+
+          {/* lyrics */}
+          <div className="glass mt-4 rounded-2xl p-4 sm:p-5">
+            <div className="flex flex-wrap items-end justify-between gap-2">
+              <div>
+                <p className="eyebrow">Lyrics</p>
+                <p className="display mt-1 text-lg text-white">{sheet?.jp ?? '歌詞'}</p>
+              </div>
+              <span className="chip !normal-case">
+                <Sparkles className="size-3" aria-hidden />
+                Original words
+              </span>
+            </div>
+            {sheet && sheet.lines.length > 0 ? (
+              <div className="lyrics-scroll mt-3 max-h-52 space-y-2 overflow-y-auto pr-1 text-[13.5px] leading-relaxed sm:max-h-60">
+                {sheet.lines.map((line, index) => (
+                  <p
+                    key={line}
+                    className="lyric-line text-white/45"
+                    data-active={index === activeLyric}
+                    aria-current={index === activeLyric ? 'true' : undefined}
+                  >
+                    {line}
+                  </p>
+                ))}
+              </div>
+            ) : (
+              <p className="mt-2 text-[12.5px] leading-relaxed text-white/45">
+                {sheet?.instrumental || !sheet
+                  ? 'An instrumental score — close your eyes and let the petals do the singing.'
+                  : 'No lyrics for this track yet.'}
+              </p>
+            )}
+            <p className="mt-3 flex items-center gap-1.5 text-[10px] uppercase tracking-[0.16em] text-white/25">
+              <Music4 className="size-2.5" aria-hidden />
+              Lines glow in time with playback · {Math.round(lyricProgress * 100)}%
+            </p>
           </div>
 
           <p className="mt-5 text-center text-[10px] uppercase tracking-[0.2em] text-white/20">

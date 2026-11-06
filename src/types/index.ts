@@ -130,9 +130,19 @@ export interface UserProfile {
 }
 
 export type RepeatMode = 'off' | 'all' | 'one';
-export type AccentId = 'cyan' | 'violet' | 'sakura' | 'gold';
+export type ThemeId =
+  | 'sakura'
+  | 'moonlight'
+  | 'cyber'
+  | 'aqua'
+  | 'sunset'
+  | 'midnight'
+  | 'koi'
+  | 'emerald';
 export type MotionPreference = 'system' | 'reduced' | 'full';
-export type VisualizerStyle = 'bars' | 'wave' | 'aurora';
+export type VisualizerStyle = 'bars' | 'wave' | 'aura';
+export type SakuraIntensity = 'gentle' | 'normal' | 'heavy';
+export type PerformanceMode = 'auto' | 'quality' | 'battery';
 
 export interface Settings {
   volume: number;
@@ -140,12 +150,20 @@ export interface Settings {
   shuffle: boolean;
   repeat: RepeatMode;
   rate: number;
-  accent: AccentId;
+  theme: ThemeId;
   motion: MotionPreference;
   visualizer: boolean;
   visualizerStyle: VisualizerStyle;
   showQueue: boolean;
   resumeLastTrack: boolean;
+  /** Sakura petal effect switch. */
+  sakura: boolean;
+  sakuraIntensity: SakuraIntensity;
+  /** Cinematic background motion (moon drift, fog, parallax). */
+  backgroundAnimation: boolean;
+  /** Glow multiplier for buttons, artwork and the visualizer (0.4–1.6). */
+  glow: number;
+  performanceMode: PerformanceMode;
 }
 
 export interface PersistedQueue {

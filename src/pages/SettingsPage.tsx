@@ -18,7 +18,13 @@ import {
   Wifi,
   WifiOff,
 } from 'lucide-react';
-import type { AccentId, MotionPreference, RepeatMode, VisualizerStyle } from '@/types';
+import type {
+  MotionPreference,
+  PerformanceMode,
+  RepeatMode,
+  SakuraIntensity,
+  VisualizerStyle,
+} from '@/types';
 import { ConfirmDialog } from '@/components/ui/ConfirmDialog';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { Slider } from '@/components/ui/Slider';
@@ -26,19 +32,13 @@ import { Visualizer } from '@/components/player/Visualizer';
 import { useInstallPrompt } from '@/hooks/useInstallPrompt';
 import { usePageTitle } from '@/hooks/usePageTitle';
 import { dbPersistStorage } from '@/lib/db';
+import { THEMES } from '@/lib/themes';
 import { clearEntered } from '@/lib/storage';
 import { useLibrary } from '@/state/LibraryProvider';
 import { usePlayer } from '@/state/PlayerProvider';
 import { useSettings } from '@/state/SettingsProvider';
 import { useUI } from '@/state/UIContext';
 import { cn, formatBytes, formatNumber, pluralize } from '@/lib/utils';
-
-const ACCENTS: Array<{ id: AccentId; label: string; color: string }> = [
-  { id: 'cyan', label: 'Electric cyan', color: '#38e8ff' },
-  { id: 'violet', label: 'Midnight violet', color: '#a78bfa' },
-  { id: 'sakura', label: 'Sakura glow', color: '#ff8fc0' },
-  { id: 'gold', label: 'Golden hour', color: '#ffd6a5' },
-];
 
 const SHORTCUTS: Array<[string, string]> = [
   ['Space', 'Play / pause'],
@@ -149,31 +149,75 @@ export function SettingsPage() {
 
       {/* ------------------------------------------------------------ appearance */}
       <section className="mb-6">
-        <SectionTitle icon={Palette} title="Appearance" description="Accent colour and motion." />
+        <SectionTitle
+          icon={Palette}
+          title="Appearance"
+          description="Sakura Dream themes, glow and motion."
+        />
         <div className="glass divide-y divide-white/6 rounded-2xl">
-          <SettingRow label="Accent colour" description="Used for highlights, sliders and the visualizer.">
-            <div className="flex flex-wrap gap-2">
-              {ACCENTS.map((accent) => (
-                <button
-                  key={accent.id}
-                  type="button"
-                  onClick={() => update({ accent: accent.id })}
-                  aria-pressed={settings.accent === accent.id}
-                  className="flex items-center gap-2 rounded-full border border-white/12 px-3 py-1.5 text-[11.5px] text-white/75 transition hover:border-white/25"
-                  style={{
-                    borderColor: settings.accent === accent.id ? accent.color : undefined,
-                    background: settings.accent === accent.id ? 'rgba(255,255,255,0.06)' : undefined,
-                  }}
-                >
-                  <span
-                    className="size-3 rounded-full"
-                    style={{ background: accent.color, boxShadow: `0 0 12px ${accent.color}` }}
-                    aria-hidden
-                  />
-                  {accent.label}
-                  {settings.accent === accent.id ? <Check className="size-3" aria-hidden /> : null}
-                </button>
-              ))}
+          <div className="p-4 sm:p-5">
+            <div className="flex flex-wrap items-baseline justify-between gap-2">
+              <p className="text-[13px] text-white">Theme</p>
+              <p className="text-[11px] text-white/40">
+                Recolours the night scene, petals, glows and controls.
+              </p>
+            </div>
+            <div className="theme-grid mt-3">
+              {THEMES.map((theme) => {
+                const active = settings.theme === theme.id;
+                return (
+                  <button
+                    key={theme.id}
+                    type="button"
+                    onClick={() => update({ theme: theme.id })}
+                    aria-pressed={active}
+                    data-active={active}
+                    className="theme-card bg-white/[0.03]"
+                  >
+                    <span
+                      className="theme-card-preview block"
+                      style={{
+                        background: `linear-gradient(160deg, ${theme.swatch[0]} 0%, ${theme.swatch[1]} 58%, ${theme.swatch[2]} 100%)`,
+                      }}
+                      aria-hidden
+                    >
+                      <span
+                        className="absolute right-2 top-2 size-3 rounded-full"
+                        style={{ background: theme.swatch[2], boxShadow: `0 0 12px ${theme.swatch[2]}` }}
+                      />
+                    </span>
+                    <span className="flex items-center justify-between gap-1.5">
+                      <span className="min-w-0">
+                        <span className="block truncate text-[11.5px] font-medium text-white">
+                          {theme.label}
+                        </span>
+                        <span className="jp mt-0.5 block truncate text-[9px] tracking-[0.2em] text-white/45">
+                          {theme.jp}
+                        </span>
+                      </span>
+                      {active ? <Check className="size-3.5 shrink-0 text-[var(--accent)]" aria-hidden /> : null}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          <SettingRow
+            label="Glow intensity"
+            description="Strength of the neon halos on controls, artwork and petals."
+          >
+            <div className="flex w-full items-center gap-3 sm:w-56">
+              <Slider
+                value={settings.glow}
+                max={1.6}
+                step={0.05}
+                ariaLabel="Glow intensity"
+                onChange={(value) => update({ glow: Math.max(0.4, value) })}
+              />
+              <span className="w-10 shrink-0 text-right text-[11px] tabular-nums text-white/50">
+                {Math.round(settings.glow * 100)}%
+              </span>
             </div>
           </SettingRow>
 
@@ -207,7 +251,7 @@ export function SettingsPage() {
                 options={[
                   { value: 'bars', label: 'Bars' },
                   { value: 'wave', label: 'Wave' },
-                  { value: 'aurora', label: 'Aurora' },
+                  { value: 'aura', label: 'Aura' },
                 ]}
                 value={settings.visualizerStyle}
                 onChange={(value) => update({ visualizerStyle: value })}
@@ -215,6 +259,71 @@ export function SettingsPage() {
                 disabled={!settings.visualizer}
               />
             </div>
+          </SettingRow>
+        </div>
+      </section>
+
+      {/* ------------------------------------------------------------ atmosphere */}
+      <section className="mb-6">
+        <SectionTitle
+          icon={Sparkles}
+          title="Sakura atmosphere"
+          description="Petals, night-scene motion and performance."
+        />
+        <div className="glass divide-y divide-white/6 rounded-2xl">
+          <SettingRow
+            label="Sakura petals"
+            description="Continuous falling petals, light motes and sparkles on every screen."
+          >
+            <Toggle
+              checked={settings.sakura}
+              onChange={(checked) => update({ sakura: checked })}
+              label="Sakura petals"
+            />
+          </SettingRow>
+
+          <SettingRow
+            label="Petal intensity"
+            description="Density of the petal field. Auto-adapts on slower devices."
+          >
+            <SegmentedControl<SakuraIntensity>
+              options={[
+                { value: 'gentle', label: 'Gentle' },
+                { value: 'normal', label: 'Normal' },
+                { value: 'heavy', label: 'Heavy' },
+              ]}
+              value={settings.sakuraIntensity}
+              onChange={(value) => update({ sakuraIntensity: value })}
+              ariaLabel="Petal intensity"
+              disabled={!settings.sakura}
+            />
+          </SettingRow>
+
+          <SettingRow
+            label="Background animation"
+            description="Slow moon drift, fog and blossom swaying."
+          >
+            <Toggle
+              checked={settings.backgroundAnimation}
+              onChange={(checked) => update({ backgroundAnimation: checked })}
+              label="Background animation"
+            />
+          </SettingRow>
+
+          <SettingRow
+            label="Performance mode"
+            description="Auto trims the petal budget if the frame rate drops."
+          >
+            <SegmentedControl<PerformanceMode>
+              options={[
+                { value: 'auto', label: 'Auto' },
+                { value: 'quality', label: 'Quality' },
+                { value: 'battery', label: 'Battery' },
+              ]}
+              value={settings.performanceMode}
+              onChange={(value) => update({ performanceMode: value })}
+              ariaLabel="Performance mode"
+            />
           </SettingRow>
         </div>
       </section>

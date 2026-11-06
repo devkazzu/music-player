@@ -14,7 +14,7 @@ export function MobileNav() {
   return (
     <nav
       aria-label="Mobile navigation"
-      className="fixed inset-x-0 bottom-0 z-40 border-t border-white/10 bg-[#05070f]/95 pb-[env(safe-area-inset-bottom,0px)] backdrop-blur-2xl md:hidden"
+      className="chrome-nav fixed inset-x-0 bottom-0 z-40 border-t pb-[env(safe-area-inset-bottom,0px)] backdrop-blur-2xl md:hidden"
     >
       <ul className="flex items-stretch justify-around px-1">
         {ITEMS.map((item) => (

@@ -1,23 +1,41 @@
 @import 'tailwindcss';
 
+/* Japanese display text: Noto Sans JP, subset to the glyphs this app uses (~55 kB total). */
+@font-face {
+  font-family: 'Noto Sans JP';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('../assets/fonts/noto-sans-jp-400-subset.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Noto Sans JP';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url('../assets/fonts/noto-sans-jp-700-subset.woff2') format('woff2');
+}
+
 /* ==========================================================================
    HIRO SEGAWA — cinematic anime design system
    ========================================================================== */
 
 @theme {
-  --font-sans: 'Inter Variable', 'Hiragino Kaku Gothic ProN', 'Yu Gothic', ui-sans-serif, system-ui, sans-serif;
-  --font-display: 'Cormorant Garamond', 'Hiragino Mincho ProN', 'Yu Mincho', ui-serif, Georgia, serif;
+  --font-sans: 'Manrope', 'Noto Sans JP', 'Hiragino Kaku Gothic ProN', 'Yu Gothic', ui-sans-serif, system-ui, sans-serif;
+  --font-display: 'Poppins', 'Manrope', 'Noto Sans JP', ui-sans-serif, system-ui, sans-serif;
+  --font-ui: 'Quicksand', 'Manrope', ui-sans-serif, system-ui, sans-serif;
+  --font-jp: 'Noto Sans JP', 'Hiragino Kaku Gothic ProN', 'Yu Gothic', sans-serif;
 
-  --color-void: #04050c;
-  --color-ink: #070a16;
-  --color-ink-2: #0b1024;
-  --color-ink-3: #121a35;
-  --color-mist: #9fadd4;
-  --color-snow: #eef2ff;
-  --color-violet: #8b5cf6;
-  --color-cyan: #38e8ff;
-  --color-sakura: #ff7ab8;
-  --color-gold: #ffd6a5;
+  --color-void: #0B0714;
+  --color-ink: #12081F;
+  --color-ink-2: #1A0D2A;
+  --color-ink-3: #2D1452;
+  --color-mist: #D8BEE8;
+  --color-snow: #FFF7FC;
+  --color-violet: #7B2CBF;
+  --color-cyan: #C77DFF;
+  --color-sakura: #FF9BD2;
+  --color-gold: #FFD9A0;
 
   --radius-4xl: 2rem;
 
@@ -68,38 +86,76 @@
   70% { transform: scale(1.18); opacity: 0; }
   100% { transform: scale(1.18); opacity: 0; }
 }
+@keyframes cb-drift {
+  0% { transform: translate3d(-1.5%, 0, 0) scale(1.02); }
+  50% { transform: translate3d(1.5%, -1%, 0) scale(1.05); }
+  100% { transform: translate3d(-1.5%, 0, 0) scale(1.02); }
+}
+@keyframes cb-twinkle {
+  0%, 100% { opacity: 0.25; transform: scale(0.85); }
+  50% { opacity: 1; transform: scale(1.1); }
+}
+@keyframes cb-fog {
+  0% { transform: translate3d(-6%, 0, 0); opacity: 0.28; }
+  50% { transform: translate3d(6%, -2%, 0); opacity: 0.45; }
+  100% { transform: translate3d(-6%, 0, 0); opacity: 0.28; }
+}
+@keyframes cb-breathe {
+  0%, 100% { opacity: 0.75; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.04); }
+}
+@keyframes cb-blossom {
+  0%, 100% { opacity: 0.55; transform: translateY(0); }
+  50% { opacity: 0.95; transform: translateY(-4px); }
+}
+@keyframes ripple {
+  0% { transform: scaleX(0.9) translateY(0); opacity: 0.4; }
+  50% { transform: scaleX(1.08) translateY(-3px); opacity: 0.7; }
+  100% { transform: scaleX(0.9) translateY(0); opacity: 0.4; }
+}
+@keyframes sakura-sway {
+  0%, 100% { transform: rotate(-1.4deg) translateY(0); }
+  50% { transform: rotate(1.4deg) translateY(-6px); }
+}
 
 :root {
-  --accent: #38e8ff;
-  --accent-2: #8b5cf6;
-  --accent-3: #ff7ab8;
-  --accent-rgb: 56, 232, 255;
-  --accent-soft: rgba(56, 232, 255, 0.16);
-  --surface: rgba(13, 18, 38, 0.62);
-  --hairline: rgba(255, 255, 255, 0.08);
   color-scheme: dark;
-}
 
-[data-accent='violet'] {
-  --accent: #a78bfa;
-  --accent-2: #38e8ff;
-  --accent-3: #ff7ab8;
-  --accent-rgb: 167, 139, 250;
-  --accent-soft: rgba(167, 139, 250, 0.18);
-}
-[data-accent='sakura'] {
-  --accent: #ff8fc0;
-  --accent-2: #8b5cf6;
-  --accent-3: #38e8ff;
-  --accent-rgb: 255, 143, 192;
-  --accent-soft: rgba(255, 143, 192, 0.18);
-}
-[data-accent='gold'] {
-  --accent: #ffd6a5;
-  --accent-2: #ff9f68;
-  --accent-3: #38e8ff;
-  --accent-rgb: 255, 214, 165;
-  --accent-soft: rgba(255, 214, 165, 0.18);
+  /* Sakura Dream palette — overwritten at runtime by SettingsProvider. */
+  --accent: #FF9BD2;
+  --accent-2: #C77DFF;
+  --accent-3: #7B2CBF;
+  --accent-rgb: 255, 155, 210;
+  --accent-soft: rgba(255, 155, 210, 0.16);
+  --surface: rgba(35, 17, 54, 0.64);
+  --surface-strong: rgba(11, 7, 20, 0.82);
+  --hairline: rgba(199, 125, 255, 0.18);
+  --text: #fff7fc;
+  --mist: #d8bee8;
+  --moon: #f0d7ff;
+  --moon-glow: rgba(199, 125, 255, 0.65);
+  --moon-x: 68%;
+  --moon-y: 20%;
+  --moon-size: 26;
+  --moon-opacity: 0.95;
+  --torii-x: 50%;
+  --torii-y: 70%;
+  --torii-scale: 1;
+  --sky-top: #07030f;
+  --sky-mid: #1a0d2a;
+  --sky-bottom: #2d1452;
+  --ridge-near: #150a24;
+  --ridge-far: #2a1443;
+  --lake: #160b26;
+  --lake-glow: rgba(199, 125, 255, 0.35);
+  --petal-a: #ffd3ea;
+  --petal-b: #ff9bd2;
+  --petal-c: #c77dff;
+  --lantern: #ffc2e4;
+
+  --glow: 1;
+  --glow-soft: calc(0.4 * var(--glow));
+  --glow-strong: calc(0.75 * var(--glow));
 }
 
 @layer base {
@@ -115,8 +171,8 @@
   body {
     margin: 0;
     min-height: 100dvh;
-    background-color: var(--color-void);
-    color: var(--color-snow);
+    background-color: #0B0714;
+    color: var(--text);
     font-family: var(--font-sans);
     font-synthesis-weight: none;
     overscroll-behavior-y: none;
@@ -192,7 +248,7 @@
 
 /* ------------------------------------------------------------------- surface */
 .glass {
-  background: linear-gradient(155deg, rgba(24, 31, 58, 0.62), rgba(9, 13, 28, 0.72));
+  background: linear-gradient(155deg, var(--surface), var(--surface-strong));
   border: 1px solid var(--hairline);
   backdrop-filter: blur(22px) saturate(130%);
   -webkit-backdrop-filter: blur(22px) saturate(130%);
@@ -206,7 +262,8 @@
 }
 
 .glass-bar {
-  background: linear-gradient(180deg, rgba(9, 13, 28, 0.86), rgba(6, 8, 18, 0.95));
+  background: var(--surface-strong);
+  background: linear-gradient(180deg, color-mix(in oklab, var(--surface-strong) 88%, transparent), var(--surface-strong));
   border-top: 1px solid rgba(255, 255, 255, 0.07);
   backdrop-filter: blur(26px) saturate(140%);
   -webkit-backdrop-filter: blur(26px) saturate(140%);
@@ -219,11 +276,11 @@
 .ring-glow {
   box-shadow:
     0 0 0 1px rgba(255, 255, 255, 0.07),
-    0 24px 70px -30px rgba(var(--accent-rgb), 0.55);
+    0 24px 70px -30px rgba(var(--accent-rgb), var(--glow-strong));
 }
 
 .accent-glow {
-  box-shadow: 0 18px 60px -22px rgba(var(--accent-rgb), 0.75);
+  box-shadow: 0 18px 60px -22px rgba(var(--accent-rgb), calc(0.9 * var(--glow)));
 }
 
 .text-accent { color: var(--accent); }
@@ -255,14 +312,25 @@
 
 .display {
   font-family: var(--font-display);
-  font-weight: 300;
-  letter-spacing: -0.015em;
-  line-height: 0.95;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  line-height: 0.98;
+}
+
+.logo-wordmark {
+  font-family: var(--font-display);
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  background: linear-gradient(96deg, #ffffff 0%, var(--petal-a) 38%, var(--accent) 72%, var(--accent-2) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  text-shadow: 0 0 26px rgba(var(--accent-rgb), calc(0.35 * var(--glow)));
 }
 
 .jp {
-  font-family: 'Hiragino Mincho ProN', 'Yu Mincho', 'Noto Serif JP', serif;
-  letter-spacing: 0.28em;
+  font-family: var(--font-jp);
+  letter-spacing: 0.3em;
 }
 
 /* --------------------------------------------------------------------- media */
@@ -626,3 +694,492 @@ html[data-reduce-motion='true'] *::after {
 
 .thumb-always::-webkit-slider-thumb { opacity: 1; }
 .thumb-always::-moz-range-thumb { opacity: 1; }
+
+/* ==========================================================================
+   SAKURA DREAM — cinematic layers
+   ========================================================================== */
+
+.cinematic-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+  background: linear-gradient(
+    180deg,
+    var(--sky-top) 0%,
+    var(--sky-mid) 46%,
+    var(--sky-bottom) 68%,
+    var(--sky-bottom) 100%
+  );
+  transition: background 900ms ease;
+}
+
+.cb-sky {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(120% 70% at 50% 108%, var(--lake-glow), transparent 68%),
+    radial-gradient(70% 50% at var(--moon-x) var(--moon-y), rgba(var(--accent-rgb), 0.2), transparent 66%);
+  mix-blend-mode: screen;
+  opacity: 0.85;
+}
+
+.cb-stars {
+  position: absolute;
+  inset: 0;
+}
+
+.cb-star {
+  position: absolute;
+  border-radius: 999px;
+  background: #fff;
+  box-shadow: 0 0 6px rgba(255, 255, 255, 0.8);
+  animation: cb-twinkle 5s ease-in-out infinite;
+}
+
+.cb-moon {
+  position: absolute;
+  left: var(--moon-x);
+  top: var(--moon-y);
+  width: calc(var(--moon-size) * 1.15vmin);
+  aspect-ratio: 1;
+  translate: -50% -50%;
+  opacity: var(--moon-opacity);
+}
+
+.cb-moon-core {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: radial-gradient(circle at 36% 32%, #ffffff 0%, var(--moon) 46%, transparent 100%);
+  background:
+    radial-gradient(circle at 36% 32%, #ffffff 0%, var(--moon) 42%, color-mix(in oklab, var(--moon) 55%, var(--accent-2)) 78%, transparent 100%);
+  box-shadow:
+    0 0 calc(60px * var(--glow)) 0 var(--moon-glow),
+    0 0 calc(180px * var(--glow)) calc(20px * var(--glow)) color-mix(in oklab, var(--moon-glow) 55%, transparent);
+  filter: saturate(1.05);
+}
+
+.cb-moon-craters {
+  position: absolute;
+  inset: 6%;
+  border-radius: 50%;
+  opacity: 0.22;
+  mix-blend-mode: multiply;
+  background:
+    radial-gradient(circle at 32% 40%, rgba(80, 30, 110, 0.55) 0 8%, transparent 9%),
+    radial-gradient(circle at 58% 28%, rgba(80, 30, 110, 0.4) 0 5%, transparent 6%),
+    radial-gradient(circle at 66% 58%, rgba(60, 20, 90, 0.45) 0 10%, transparent 11%),
+    radial-gradient(circle at 44% 70%, rgba(70, 25, 100, 0.35) 0 6%, transparent 7%);
+}
+
+.cb-moon-halo {
+  position: absolute;
+  inset: -26%;
+  border-radius: 50%;
+  background: radial-gradient(circle, color-mix(in oklab, var(--moon-glow) 60%, transparent) 0%, transparent 66%);
+  animation: cb-breathe 9s ease-in-out infinite;
+}
+
+.cb-ridges {
+  position: absolute;
+  inset: auto 0 24% 0;
+  width: 100%;
+  height: 40%;
+}
+
+.cb-ridge-far { fill: var(--ridge-far); }
+.cb-ridge-near { fill: var(--ridge-near); }
+
+.cb-lake {
+  position: absolute;
+  inset: auto 0 0 0;
+  height: 30%;
+  background:
+    linear-gradient(180deg, color-mix(in oklab, var(--lake) 70%, transparent), var(--lake) 55%, #05020b 100%);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06);
+}
+
+.cb-moon-reflection {
+  position: absolute;
+  left: var(--moon-x);
+  top: 0;
+  width: calc(var(--moon-size) * 0.9vmin);
+  height: 68%;
+  translate: -50% 0;
+  background: linear-gradient(180deg, var(--moon-glow), transparent 85%);
+  filter: blur(calc(10px * var(--glow)));
+  opacity: 0.5;
+  border-radius: 50%;
+}
+
+.cb-ripples {
+  position: absolute;
+  left: 8%;
+  right: 8%;
+  top: 34%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.28), transparent);
+  animation: ripple 9s ease-in-out infinite;
+}
+
+.cb-ripples-2 {
+  top: 62%;
+  left: 18%;
+  right: 18%;
+  animation-duration: 13s;
+  animation-delay: -4s;
+  opacity: 0.6;
+}
+
+.cb-landmark {
+  position: absolute;
+  left: var(--torii-x);
+  top: var(--torii-y);
+  height: 22%;
+  translate: -50% -50%;
+  transform: scale(var(--torii-scale));
+  transform-origin: center bottom;
+  overflow: visible;
+}
+
+.cb-torii { fill: #1a0716; }
+.cb-torii path:first-child,
+.cb-torii rect { fill: color-mix(in oklab, var(--accent-3) 34%, #0a0410); }
+.cb-torii-base { fill: #0a0410; }
+.cb-torii-lamp {
+  fill: var(--lantern);
+  filter: drop-shadow(0 0 calc(8px * var(--glow)) var(--lantern));
+}
+
+.cb-pagoda { fill: color-mix(in oklab, var(--accent-3) 30%, #0a0410); }
+.cb-pagoda .cb-window {
+  fill: var(--lantern);
+  opacity: 0.8;
+  filter: drop-shadow(0 0 6px var(--lantern));
+}
+
+.cb-bamboo { fill: none; }
+.cb-bamboo-stalks rect {
+  fill: color-mix(in oklab, var(--accent-3) 28%, #07130d);
+  opacity: 0.9;
+}
+.cb-bamboo-leaf {
+  fill: color-mix(in oklab, var(--accent-3) 40%, #07130d);
+  stroke: none;
+}
+
+.cb-koi { fill: none; }
+.cb-koi-body { fill: color-mix(in oklab, var(--accent) 55%, #14040a); opacity: 0.85; }
+.cb-koi-fin { fill: color-mix(in oklab, var(--accent-2) 50%, #14040a); opacity: 0.8; }
+.cb-koi-eye { fill: #0a0206; }
+.cb-koi-line { stroke: color-mix(in oklab, var(--accent-3) 55%, #ffffff); stroke-width: 2; opacity: 0.5; fill: none; }
+.cb-ripple-line { stroke: rgba(255, 255, 255, 0.25); stroke-width: 1.4; fill: none; }
+
+.cb-houses {
+  position: absolute;
+  right: 2%;
+  bottom: 22%;
+  width: 30%;
+  height: 13%;
+  opacity: 0.9;
+}
+
+.cb-houses g > path {
+  fill: color-mix(in oklab, var(--accent-3) 22%, #0a0410);
+}
+
+.cb-houses .cb-window {
+  fill: var(--lantern);
+  opacity: 0.9;
+  filter: drop-shadow(0 0 5px var(--lantern));
+}
+
+.cb-branch {
+  position: absolute;
+  top: -3%;
+  width: 30%;
+  min-width: 240px;
+  max-width: 520px;
+  height: 38%;
+  opacity: 0.9;
+  overflow: visible;
+}
+
+.cb-branch-left { left: -4%; }
+.cb-branch-right { right: -4%; }
+
+.cb-branch-line {
+  fill: none;
+  stroke: color-mix(in oklab, var(--accent-3) 30%, #0b0410);
+  stroke-width: 4;
+  stroke-linecap: round;
+}
+
+.cb-blossom-glow {
+  fill: color-mix(in oklab, var(--petal-b) 50%, transparent);
+  filter: blur(6px);
+}
+
+.cb-blossom-core {
+  fill: var(--petal-b);
+  opacity: 0.85;
+}
+
+.cb-blossom {
+  animation: cb-blossom 7s ease-in-out infinite;
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+.cb-branch-anim {
+  animation: sakura-sway 12s ease-in-out infinite;
+  transform-origin: top left;
+}
+
+.cb-fog {
+  position: absolute;
+  width: 90%;
+  height: 26%;
+  filter: blur(46px);
+  border-radius: 50%;
+  opacity: 0.35;
+  mix-blend-mode: screen;
+}
+
+.cb-fog-1 {
+  left: -18%;
+  top: 48%;
+  background: radial-gradient(circle, color-mix(in oklab, var(--moon-glow) 40%, transparent), transparent 70%);
+  animation: cb-fog 22s ease-in-out infinite;
+}
+
+.cb-fog-2 {
+  right: -20%;
+  top: 34%;
+  height: 20%;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.14), transparent 70%);
+  animation: cb-fog 30s ease-in-out infinite reverse;
+}
+
+.cb-vignette {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(120% 80% at 50% 40%, transparent 34%, rgba(5, 2, 11, 0.55) 100%),
+    linear-gradient(180deg, rgba(5, 2, 11, 0.45) 0%, transparent 24%, transparent 62%, rgba(5, 2, 11, 0.72) 100%);
+}
+
+[data-animations='off'] .cb-anim,
+[data-animations='off'] .cb-blossom,
+[data-animations='off'] .cb-branch-anim,
+[data-animations='off'] .cb-star,
+[data-animations='off'] .cb-fog,
+[data-animations='off'] .cb-ripples {
+  animation: none !important;
+}
+
+/* ------------------------------------------------------------------ petals */
+.sakura-layer {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.sakura-back { z-index: 3; opacity: 0.92; }
+.sakura-fore { z-index: 26; opacity: 0.55; }
+
+/* -------------------------------------------------------------------- logo */
+.theme-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 0.55rem;
+}
+
+.theme-card {
+  position: relative;
+  overflow: hidden;
+  border-radius: 1rem;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 0.65rem;
+  text-align: left;
+  transition: transform 220ms cubic-bezier(0.16, 1, 0.3, 1), border-color 220ms ease, box-shadow 220ms ease;
+}
+
+.theme-card:hover { transform: translateY(-2px); }
+.theme-card[data-active='true'] {
+  border-color: var(--accent);
+  box-shadow: 0 12px 34px -16px rgba(var(--accent-rgb), 0.9);
+}
+
+.theme-card-preview {
+  height: 46px;
+  border-radius: 0.6rem;
+  position: relative;
+  overflow: hidden;
+  margin-bottom: 0.45rem;
+}
+
+.theme-card-preview::after {
+  content: '';
+  position: absolute;
+  inset: auto 0 0 0;
+  height: 42%;
+  background: linear-gradient(180deg, transparent, rgba(0, 0, 0, 0.45));
+}
+
+/* ------------------------------------------------------------------ player */
+.now-playing-glow {
+  position: relative;
+}
+
+.now-playing-glow::before {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  border-radius: inherit;
+  padding: 2px;
+  background: conic-gradient(
+    from 0deg,
+    var(--accent),
+    var(--accent-2),
+    var(--petal-a),
+    var(--accent-3),
+    var(--accent)
+  );
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  opacity: calc(0.55 + 0.3 * var(--glow));
+  animation: spin 14s linear infinite;
+  pointer-events: none;
+}
+
+.lyrics-scroll {
+  mask-image: linear-gradient(180deg, transparent, #000 8%, #000 92%, transparent);
+}
+
+.lyric-line {
+  transition: color 400ms ease, text-shadow 400ms ease, transform 400ms ease;
+}
+
+.lyric-line[data-active='true'] {
+  color: #fff;
+  text-shadow: 0 0 22px rgba(var(--accent-rgb), 0.55);
+  transform: translateX(4px);
+}
+
+/* ------------------------------------------------------- page transitions */
+@keyframes page-in {
+  from { opacity: 0; transform: translate3d(0, 14px, 0) scale(0.995); }
+  to { opacity: 1; transform: none; }
+}
+
+.page {
+  animation: page-in 520ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .page { animation: none; }
+  .cb-anim,
+  .cb-blossom,
+  .cb-branch-anim,
+  .cb-star,
+  .cb-fog,
+  .cb-ripples,
+  .now-playing-glow::before {
+    animation: none !important;
+  }
+}
+
+[data-reduce-motion='true'] .page,
+[data-reduce-motion='true'] .now-playing-glow::before {
+  animation: none !important;
+}
+
+/* ------------------------------------------------------ themed chrome surfaces */
+.chrome-top {
+  background: var(--surface-strong);
+  background: color-mix(in oklab, var(--surface-strong) 86%, transparent);
+  border-color: var(--hairline);
+  backdrop-filter: blur(26px) saturate(140%);
+  -webkit-backdrop-filter: blur(26px) saturate(140%);
+}
+
+.chrome-side {
+  background: var(--surface);
+  background: linear-gradient(
+    180deg,
+    color-mix(in oklab, var(--surface) 72%, transparent),
+    color-mix(in oklab, var(--surface-strong) 94%, transparent)
+  );
+  border-color: var(--hairline);
+  backdrop-filter: blur(26px) saturate(140%);
+  -webkit-backdrop-filter: blur(26px) saturate(140%);
+}
+
+.chrome-nav {
+  background: var(--surface-strong);
+  background: color-mix(in oklab, var(--surface-strong) 94%, transparent);
+  border-color: var(--hairline);
+  backdrop-filter: blur(26px) saturate(140%);
+  -webkit-backdrop-filter: blur(26px) saturate(140%);
+}
+
+.chrome-mini {
+  background: var(--surface-strong);
+  background: color-mix(in oklab, var(--surface-strong) 96%, transparent);
+  border-color: var(--hairline);
+  box-shadow: 0 -20px 60px -20px rgba(0, 0, 0, 0.8), 0 0 40px -18px rgba(var(--accent-rgb), 0.5);
+}
+
+.chrome-panel {
+  background: var(--surface-strong);
+  background: linear-gradient(180deg, color-mix(in oklab, var(--surface) 60%, transparent), var(--surface-strong));
+  border-color: var(--hairline);
+}
+
+/* CSS-only petals for the splash overlay (the canvas field sits behind it). */
+.sakura-css-petal {
+  position: absolute;
+  top: -6%;
+  border-radius: 62% 38% 58% 42% / 58% 46% 54% 42%;
+  background: linear-gradient(150deg, var(--petal-a), var(--petal-b) 55%, var(--petal-c));
+  box-shadow: 0 0 10px rgba(var(--accent-rgb), 0.35);
+  animation-name: splash-petal-fall;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+  will-change: transform;
+}
+
+@keyframes splash-petal-fall {
+  0% { transform: translate3d(0, -8vh, 0) rotate(0deg); opacity: 0; }
+  8% { opacity: 0.85; }
+  50% { transform: translate3d(6vw, 46vh, 0) rotate(180deg); }
+  92% { opacity: 0.7; }
+  100% { transform: translate3d(-4vw, 108vh, 0) rotate(340deg); opacity: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sakura-css-petal { animation: none; display: none; }
+}
+
+/* Pointer parallax (values are written by CinematicBackdrop on pointermove). */
+.cb-moon {
+  translate: calc(-50% + var(--par-x, 0px)) calc(-50% + var(--par-y, 0px));
+  transition: translate 500ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.cb-ridges {
+  transform: translate3d(calc(var(--par-x, 0px) * -0.55), calc(var(--par-y, 0px) * -0.35), 0);
+  transition: transform 600ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.cb-houses {
+  transform: translate3d(calc(var(--par-x, 0px) * -1.1), calc(var(--par-y, 0px) * -0.5), 0);
+  transition: transform 600ms cubic-bezier(0.16, 1, 0.3, 1);
+}

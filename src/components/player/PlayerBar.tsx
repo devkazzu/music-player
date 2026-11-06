@@ -40,7 +40,7 @@ export function PlayerBar({ onToggleQueue, queueOpen }: PlayerBarProps) {
   return (
     <div className="pointer-events-none fixed inset-x-0 bottom-[calc(4rem+env(safe-area-inset-bottom,0px))] z-40 md:bottom-0">
       {/* ------------------------------------------------------------ mobile */}
-      <div className="pointer-events-auto mx-2 mb-2 overflow-hidden rounded-2xl border border-white/12 bg-[#080d1c]/95 shadow-[0_-10px_50px_-12px_rgba(0,0,0,0.9)] backdrop-blur-2xl md:hidden">
+      <div className="chrome-mini pointer-events-auto mx-2 mb-2 overflow-hidden rounded-2xl border backdrop-blur-2xl md:hidden">
         <div className="h-[2px] w-full bg-white/10">
           <div
             className="h-full bg-[linear-gradient(90deg,var(--accent),var(--accent-2))] transition-[width] duration-300 ease-linear"

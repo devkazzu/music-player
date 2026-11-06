@@ -2,6 +2,7 @@ import { useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import {
   ArrowRight,
+  Check,
   Clapperboard,
   Clock3,
   Disc3,
@@ -19,6 +20,7 @@ import {
   FEATURED_ALBUM_ID,
   GENRE_BY_ID,
   MOODS,
+  SAKURA_ART,
 } from '@/data/catalog';
 import { AlbumCard, MoodCard, PlaylistCard } from '@/components/cards/Cards';
 import { Cover } from '@/components/ui/Cover';
@@ -27,8 +29,11 @@ import { Particles } from '@/components/ui/Particles';
 import { PlayButton } from '@/components/ui/PlayButton';
 import { SectionHeader } from '@/components/ui/SectionHeader';
 import { TrackList } from '@/components/music/TrackList';
+import { FoxMark } from '@/components/atmosphere/SakuraLogo';
+import { THEMES } from '@/lib/themes';
 import { useLibrary } from '@/state/LibraryProvider';
 import { usePlayer } from '@/state/PlayerProvider';
+import { useSettings } from '@/state/SettingsProvider';
 import { usePageTitle } from '@/hooks/usePageTitle';
 import { formatDuration, formatRelativeTime, greetingForHour, pluralize } from '@/lib/utils';
 
@@ -37,6 +42,7 @@ export function HomePage() {
   const { profile, recentTracks, recent, favouriteTracks, playlists, tracksByIds, tracks, localTracks } =
     useLibrary();
   const { playQueue } = usePlayer();
+  const { settings, update } = useSettings();
 
   const featuredAlbum = ALBUMS.find((album) => album.id === FEATURED_ALBUM_ID) ?? ALBUMS[0];
   const featuredTracks = tracksByIds(featuredAlbum.trackIds);
@@ -64,17 +70,29 @@ export function HomePage() {
       <section className="relative overflow-hidden rounded-[1.75rem] border border-white/10">
         <div className="absolute inset-0">
           <img
-            src={ART.hero}
-            alt="Anime rooftop overlooking a rainy neon city at night"
-            className="size-full object-cover object-[58%_45%]"
+            src={SAKURA_ART.hero}
+            alt="Anime listener with headphones under a giant violet moon, cherry blossoms and a torii gate reflected in a lake"
+            className="size-full object-cover object-[60%_42%]"
           />
-          <div className="absolute inset-0 bg-[linear-gradient(100deg,rgba(4,5,12,0.97)_0%,rgba(5,7,18,0.88)_40%,rgba(5,7,18,0.35)_72%,rgba(4,5,12,0.75)_100%)]" />
-          <div className="absolute inset-0 bg-gradient-to-t from-[#04050c] via-transparent to-transparent" />
+          <div className="absolute inset-0 bg-[linear-gradient(100deg,rgba(11,7,20,0.97)_0%,rgba(16,8,28,0.86)_42%,rgba(16,8,28,0.24)_74%,rgba(11,7,20,0.7)_100%)]" />
+          <div className="absolute inset-0 bg-gradient-to-t from-[#0B0714] via-transparent to-transparent" />
         </div>
         <Particles count={14} seed={3} />
 
         <div className="relative flex min-h-[440px] flex-col justify-end gap-6 p-5 sm:min-h-[480px] sm:p-8 lg:min-h-[510px] lg:p-10">
           <div className="max-w-2xl">
+            <div className="mb-5 flex items-center gap-3">
+              <span className="grid size-10 place-items-center rounded-2xl border border-[color:var(--hairline)] bg-black/30 backdrop-blur-md">
+                <FoxMark className="size-6" />
+              </span>
+              <span>
+                <span className="logo-wordmark block text-[13px] leading-none">HIRO SEGAWA</span>
+                <span className="jp mt-1 block text-[8.5px] tracking-[0.32em] text-white/45">
+                  桜の夜・音の夢
+                </span>
+              </span>
+            </div>
+
             <div className="flex flex-wrap items-center gap-2.5">
               <span className="chip !py-1" data-selected="true">
                 <Sparkles className="size-3" aria-hidden />
@@ -377,6 +395,45 @@ export function HomePage() {
           {MOODS.map((mood) => (
             <MoodCard key={mood.id} mood={mood} />
           ))}
+        </div>
+      </section>
+
+      {/* ---------------------------------------------------------------- themes */}
+      <section>
+        <SectionHeader
+          eyebrow="Choose your night"
+          title="Sakura Dream themes"
+          description="Eight atmospheres. Each one recolours the sky, the moon, the petals and every glow."
+          action={{ label: 'All settings', to: '/settings' }}
+        />
+        <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+          {THEMES.map((theme) => {
+            const active = settings.theme === theme.id;
+            return (
+              <button
+                key={theme.id}
+                type="button"
+                onClick={() => update({ theme: theme.id })}
+                aria-pressed={active}
+                data-active={active}
+                className="theme-card"
+                style={{
+                  background: `linear-gradient(165deg, ${theme.swatch[0]} 0%, ${theme.swatch[1]} 62%, ${theme.swatch[2]} 130%)`,
+                }}
+              >
+                <span className="flex items-start justify-between gap-2">
+                  <span>
+                    <span className="block text-[12.5px] font-semibold text-white">{theme.label}</span>
+                    <span className="jp mt-0.5 block text-[9.5px] tracking-[0.24em] text-white/70">
+                      {theme.jp}
+                    </span>
+                  </span>
+                  {active ? <Check className="size-4 shrink-0 text-white" aria-hidden /> : null}
+                </span>
+                <span className="mt-6 block text-[10px] leading-snug text-white/60">{theme.tagline}</span>
+              </button>
+            );
+          })}
         </div>
       </section>
 

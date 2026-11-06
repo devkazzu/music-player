@@ -9,6 +9,7 @@ import {
 } from 'react';
 import type { Settings } from '@/types';
 import { DEFAULT_SETTINGS, loadSettings, saveSettings } from '@/lib/storage';
+import { getTheme, themeVariables } from '@/lib/themes';
 
 interface SettingsContextValue {
   settings: Settings;
@@ -32,27 +33,32 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     const root = document.documentElement;
-    root.dataset.accent = settings.accent;
+    const theme = getTheme(settings.theme);
+
+    root.dataset.theme = theme.id;
+    for (const [name, value] of Object.entries(themeVariables(theme.id))) {
+      root.style.setProperty(name, value);
+    }
+    root.style.setProperty('--glow', String(settings.glow));
+
     const resolved =
       settings.motion === 'reduced' ? 'true' : settings.motion === 'full' ? 'false' : 'system';
     if (resolved === 'true') root.dataset.reduceMotion = 'true';
     else if (resolved === 'false') root.dataset.reduceMotion = 'false';
     else delete root.dataset.reduceMotion;
 
+    const motionOff = settings.motion === 'reduced' || systemReducedMotion;
+    root.dataset.animations = settings.backgroundAnimation && !motionOff ? 'on' : 'off';
+
     const themeColor = root.querySelector('meta[name="theme-color"]');
-    if (themeColor) {
-      themeColor.setAttribute(
-        'content',
-        settings.accent === 'cyan'
-          ? '#05060f'
-          : settings.accent === 'violet'
-            ? '#0a0716'
-            : settings.accent === 'sakura'
-              ? '#12060f'
-              : '#0f0b06',
-      );
-    }
-  }, [settings.accent, settings.motion]);
+    if (themeColor) themeColor.setAttribute('content', theme.themeColor);
+  }, [
+    settings.theme,
+    settings.glow,
+    settings.backgroundAnimation,
+    settings.motion,
+    systemReducedMotion,
+  ]);
 
   useEffect(() => {
     const media = window.matchMedia('(prefers-reduced-motion: reduce)');
