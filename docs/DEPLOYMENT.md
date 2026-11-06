@@ -59,7 +59,12 @@ GitHub Pages was verified against this repository's build:
 - workflow: `.github/workflows/deploy-pages.yml`
 - build base: `/${{ github.event.repository.name }}/` → `/music-player/`
 - one-time setup: **Settings → Pages → Build and deployment → Source: GitHub Actions**
+  (the workflow also attempts this automatically with its own token; if the API refuses, the step
+  logs a warning and the manual toggle is required once)
 - URL: `https://<owner>.github.io/<repo>/`
+
+**Live deployment of this repository:** <https://devkazzu.github.io/music-player/> — served from
+the workflow artifact, `manifest.webmanifest` reports `start_url`/`scope` = `/music-player/`.
 
 Local verification performed for the sub-path build:
 
@@ -71,7 +76,12 @@ Local verification performed for the sub-path build:
 | `/music-player/sw.js` | 200 `text/javascript` |
 | `/music-player/audio/neon-requiem.mp3` | 200 `audio/mpeg` |
 | `/music-player/art/neon-requiem.jpg` | 200 `image/jpeg` |
-| `/music-player/playlists/deep-link` | 200 `text/html` (SPA fallback) |
+| `/music-player/playlists/deep-link` | served via `404.html` → redirects to the app and restores the route |
+
+Deep links: GitHub Pages cannot rewrite unknown paths to `index.html`, so the build emits
+`404.html`, which stores the requested path in `sessionStorage` and bounces to the app root; the
+app restores the route before the router mounts. This is verified by
+`tests/deeplink.test.ts` and `npm run check:pwa`. Hosts with real rewrites never use the shim.
 
 Limitations to keep in mind:
 
@@ -93,7 +103,8 @@ If you want the PWA scope at the domain root and zero build configuration, prefe
       except `localhost`).
 - [ ] `/manifest.webmanifest` returns `application/manifest+json` and every icon URL resolves.
 - [ ] `/sw.js` is served from the same origin and scope as the app.
-- [ ] Deep link reload works (e.g. open `/playlists/<id>` in a fresh tab).
+- [ ] Deep link reload works (e.g. open `/playlists/<id>` in a fresh tab) — on GitHub Pages this
+      goes through the `404.html` shim; on Netlify/Vercel/Cloudflare it is rewritten to `index.html`.
 - [ ] First load, then offline reload: the shell and demo tracks still play.
 - [ ] Install prompt appears on Android Chrome; the app opens without browser chrome.
 - [ ] Artwork and audio are served from the site's own origin (no external CDNs).

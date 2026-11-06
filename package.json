@@ -6,7 +6,7 @@
   "description": "HIRO SEGAWA \u2014 an anime cinematic music player with a real audio engine, local library, and offline PWA support.",
   "scripts": {
     "dev": "vite",
-    "build": "tsc -b && vite build",
+    "build": "tsc -b && vite build && node scripts/make-404.mjs",
     "preview": "vite preview",
     "typecheck": "tsc -b",
     "lint": "tsc -b --force",

@@ -6,6 +6,10 @@ import '@fontsource/cormorant-garamond/400.css';
 import '@fontsource/cormorant-garamond/500.css';
 import './styles/index.css';
 import { App } from './App';
+import { restoreDeepLink } from '@/lib/deepLink';
+
+// Restore client-side routes opened directly on hosts without SPA rewrites.
+restoreDeepLink();
 
 const container = document.getElementById('root');
 
