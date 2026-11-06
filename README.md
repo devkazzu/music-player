@@ -7,6 +7,8 @@ favourites and a persistent queue.
 Built with **React 19 + TypeScript + Vite**, **Tailwind CSS**, **Web Audio API**, **IndexedDB**
 (via `idb`), **LocalStorage** and **Lucide** icons, and shipped as an installable **PWA**.
 
+> **Live demo:** <https://devkazzu.github.io/music-player/> (PWA — installable from Chrome on Android)
+>
 > All nine demo tracks and every piece of artwork are original assets created for this project —
 > the audio is synthesised procedurally (`npm run gen:audio`), the artwork was generated for the
 > app. No external image or audio URLs are referenced at runtime.
