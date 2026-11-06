@@ -69,6 +69,8 @@ jobs:
   deploy:
     name: Publish
     needs: build
+    outputs:
+      page_url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
     environment:
       name: github-pages
@@ -76,3 +78,60 @@ jobs:
     steps:
       - id: deployment
         uses: actions/deploy-pages@v4
+
+  smoke:
+    name: Verify the live site
+    needs: deploy
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Check the deployed app
+        env:
+          URL: ${{ needs.deploy.outputs.page_url }}
+        run: |
+          set -euo pipefail
+          echo "Verifying $URL"
+          # Pages CDN propagation can lag a few seconds behind the deployment.
+          for attempt in $(seq 1 12); do
+            code=$(curl -sS -o /tmp/index.html -w '%{http_code}' "$URL" || true)
+            if [ "$code" = "200" ] && grep -q 'manifest.webmanifest' /tmp/index.html; then
+              break
+            fi
+            echo "attempt $attempt: HTTP $code — retrying in 5s"
+            sleep 5
+          done
+          test "$code" = "200" || { echo "home page returned $code"; exit 1; }
+          grep -q 'assets/index-' /tmp/index.html
+          echo "✓ home page + hashed bundle"
+
+          curl -sSf "$URL/manifest.webmanifest" -o /tmp/manifest.json
+          grep -q '"display":"standalone"' /tmp/manifest.json
+          echo "✓ web manifest"
+
+          curl -sSf "$URL/sw.js" -o /tmp/sw.js
+          grep -q 'precacheAndRoute\|workbox' /tmp/sw.js
+          echo "✓ service worker"
+
+          curl -sSf "$URL/404.html" -o /tmp/404.html
+          grep -q 'hiro:deep-link:v1' /tmp/404.html
+          echo "✓ deep-link shim"
+
+          # Unknown routes must return the shim body, not GitHub's stock 404.
+          curl -sS -o /tmp/deep.html -w '%{http_code}' "$URL/playlists/pl-late-night-drive" > /tmp/deep.code
+          grep -q 'hiro:deep-link:v1' /tmp/deep.html
+          echo "✓ deep links serve the app shim (HTTP $(cat /tmp/deep.code))"
+
+          curl -sSf "$URL/audio/neon-requiem.mp3" -o /tmp/track.mp3
+          test "$(wc -c < /tmp/track.mp3)" -gt 100000
+          echo "✓ demo audio ($(wc -c < /tmp/track.mp3) bytes)"
+
+          curl -sSf "$URL/art/neon-requiem.jpg" -o /tmp/art.jpg
+          test "$(wc -c < /tmp/art.jpg)" -gt 10000
+          echo "✓ artwork"
+
+          js=$(grep -o 'assets/index-[^"]*\.js' /tmp/index.html | head -1)
+          curl -sSf "$URL/$js" -o /tmp/app.js
+          test "$(wc -c < /tmp/app.js)" -gt 100000
+          echo "✓ bundle ($js)"
+
+          echo "All live checks passed."
