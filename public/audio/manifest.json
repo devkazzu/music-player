@@ -1,0 +1,65 @@
+{
+  "neon-requiem": {
+    "file": "neon-requiem.mp3",
+    "duration": 26.06,
+    "bytes": 313200,
+    "tempo": 84,
+    "mood": "night-drive"
+  },
+  "ghost-in-the-rain": {
+    "file": "ghost-in-the-rain.mp3",
+    "duration": 24.07,
+    "bytes": 289440,
+    "tempo": 92,
+    "mood": "rain"
+  },
+  "paper-lanterns": {
+    "file": "paper-lanterns.mp3",
+    "duration": 28.46,
+    "bytes": 342144,
+    "tempo": 76,
+    "mood": "golden-hour"
+  },
+  "hanabi": {
+    "file": "hanabi.mp3",
+    "duration": 25.02,
+    "bytes": 300672,
+    "tempo": 88,
+    "mood": "golden-hour"
+  },
+  "midnight-rail": {
+    "file": "midnight-rail.mp3",
+    "duration": 30.63,
+    "bytes": 368064,
+    "tempo": 70,
+    "mood": "night"
+  },
+  "station-of-dreams": {
+    "file": "station-of-dreams.mp3",
+    "duration": 33.2,
+    "bytes": 399168,
+    "tempo": 64,
+    "mood": "night"
+  },
+  "rainfall-sonata": {
+    "file": "rainfall-sonata.mp3",
+    "duration": 31.44,
+    "bytes": 378000,
+    "tempo": 68,
+    "mood": "rain"
+  },
+  "stellar-lullaby": {
+    "file": "stellar-lullaby.mp3",
+    "duration": 35.2,
+    "bytes": 422928,
+    "tempo": 60,
+    "mood": "sleep"
+  },
+  "skyline-dreams": {
+    "file": "skyline-dreams.mp3",
+    "duration": 27.2,
+    "bytes": 327024,
+    "tempo": 80,
+    "mood": "city"
+  }
+}
