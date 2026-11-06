@@ -1,0 +1,16 @@
+{
+  "appId": "com.hirosegawa.player",
+  "appName": "HIRO SEGAWA",
+  "webDir": "dist",
+  "android": {
+    "allowMixedContent": false,
+    "backgroundColor": "#05060f"
+  },
+  "ios": {
+    "contentInset": "always",
+    "backgroundColor": "#05060f"
+  },
+  "server": {
+    "androidScheme": "https"
+  }
+}
