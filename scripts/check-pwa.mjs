@@ -118,6 +118,13 @@ else {
   if (base !== '/' && !sw.includes(base)) fail(`sw.js does not reference the deployment base ${base}.`);
 }
 
+// GitHub Pages and other branch-only hosts need a 404.html deep-link shim.
+const notFound = await readText(join(DIST, '404.html'));
+if (!notFound) fail('dist/404.html is missing — deep links would 404 on GitHub Pages.');
+else if (!notFound.includes(`var SCOPE = ${JSON.stringify(base)}`)) {
+  fail(`dist/404.html does not capture deep links for base ${base}.`);
+} else ok('404.html restores deep links on hosts without SPA rewrites');
+
 if (html) {
   if (!/<meta name="theme-color"/.test(html)) fail('index.html has no theme-color meta tag.');
   if (!/viewport-fit=cover/.test(html)) fail('index.html viewport is missing viewport-fit=cover (notched Android screens).');

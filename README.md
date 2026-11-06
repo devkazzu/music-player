@@ -209,9 +209,10 @@ Clearing site data resets the app; Settings offers explicit reset/erase actions 
 npm test
 ```
 
-62 tests across 8 files run in jsdom with `fake-indexeddb` and stubbed media APIs:
+67 tests across 9 files run in jsdom with `fake-indexeddb` and stubbed media APIs:
 
 - `tests/utils.test.ts` — formatting, slugify, clamping, uid, base-path asset resolution
+- `tests/deeplink.test.ts` — deep-link restoration used by the static-host `404.html` shim
 - `tests/sorting.test.ts` — title/artist/recent sorters
 - `tests/search.test.ts` — weighted search, entity filtering, empty and no-result cases
 - `tests/metadata.test.ts` — metadata parsing paths and format detection
@@ -261,6 +262,9 @@ previews and root-domain hosting (cleanest PWA scope). Build command `npm run bu
 equally straightforward. **GitHub Pages is supported** by
 `.github/workflows/deploy-pages.yml`, which builds with `VITE_BASE=/<repo>/`; GitHub Pages was the
 only option needing extra configuration, and its sub-path deployment was verified locally.
+
+The build also emits `404.html`, which restores deep links on hosts without SPA rewrites (GitHub
+Pages), so `/playlists/<id>` works even on a fresh tab.
 
 Full details, the post-deploy checklist, update/rollback notes and the hosting comparison live in
 [`docs/DEPLOYMENT.md`](docs/DEPLOYMENT.md).

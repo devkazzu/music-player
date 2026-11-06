@@ -41,6 +41,25 @@ jobs:
           npm run build
           node scripts/check-pwa.mjs dist
 
+      # Prefer artifact deployments: legacy "deploy from a branch" builds would
+      # publish the repository root instead of dist/ and race with this job.
+      - name: Switch Pages to GitHub Actions deployments
+        continue-on-error: true
+        uses: actions/github-script@v7
+        with:
+          script: |
+            try {
+              await github.request('PUT /repos/{owner}/{repo}/pages', {
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                build_type: 'workflow',
+              });
+              core.info('Pages build_type is now "workflow".');
+            } catch (error) {
+              core.warning(`Could not switch Pages build_type automatically: ${error.message}`);
+              core.notice('Set Settings → Pages → Source to "GitHub Actions" once.');
+            }
+
       - uses: actions/configure-pages@v5
 
       - uses: actions/upload-pages-artifact@v3
