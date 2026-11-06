@@ -10,48 +10,6 @@ import { useKeyboardShortcuts } from '@/hooks/useKeyboardShortcuts';
 import { useSettings } from '@/state/SettingsProvider';
 import { useUI } from '@/state/UIContext';
 
-function Atmosphere() {
-  return (
-    <>
-      <div className="app-atmosphere" aria-hidden>
-        <div
-          className="aurora animate-breathe"
-          style={{
-            top: '-12%',
-            left: '-8%',
-            width: '46vw',
-            height: '46vw',
-            background: 'radial-gradient(circle, rgba(139,92,246,0.55), transparent 68%)',
-          }}
-        />
-        <div
-          className="aurora animate-float"
-          style={{
-            top: '8%',
-            right: '-10%',
-            width: '40vw',
-            height: '40vw',
-            background: 'radial-gradient(circle, rgba(56,232,255,0.32), transparent 70%)',
-            animationDelay: '1.5s',
-          }}
-        />
-        <div
-          className="aurora animate-breathe"
-          style={{
-            bottom: '-18%',
-            left: '30%',
-            width: '52vw',
-            height: '38vw',
-            background: 'radial-gradient(circle, rgba(255,122,184,0.2), transparent 70%)',
-            animationDelay: '3s',
-          }}
-        />
-      </div>
-      <div className="noise-overlay" aria-hidden />
-    </>
-  );
-}
-
 export function AppShell() {
   const location = useLocation();
   const mainRef = useRef<HTMLElement>(null);
@@ -94,7 +52,6 @@ export function AppShell() {
 
   return (
     <div className="relative flex h-dvh overflow-hidden">
-      <Atmosphere />
 
       <a
         href="#main"
@@ -133,7 +90,7 @@ export function AppShell() {
       </div>
 
       {settings.showQueue ? (
-        <aside className="relative z-10 hidden w-[330px] shrink-0 border-l border-white/8 bg-[#060912]/75 backdrop-blur-2xl xl:flex xl:flex-col">
+        <aside className="chrome-panel relative z-10 hidden w-[330px] shrink-0 border-l backdrop-blur-2xl xl:flex xl:flex-col">
           <QueuePanel onClose={() => update({ showQueue: false })} />
         </aside>
       ) : null}

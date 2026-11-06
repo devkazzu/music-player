@@ -1,6 +1,7 @@
 import { Link, useLocation } from 'react-router-dom';
-import { Download, Search, Disc3, Settings2 } from 'lucide-react';
+import { Download, Search, Settings2 } from 'lucide-react';
 import { Cover } from '@/components/ui/Cover';
+import { SakuraLogo } from '@/components/atmosphere/SakuraLogo';
 import { useLibrary } from '@/state/LibraryProvider';
 import { asset } from '@/lib/assets';
 import { useInstallPrompt } from '@/hooks/useInstallPrompt';
@@ -18,11 +19,10 @@ export function TopBar() {
   };
 
   return (
-    <header className="sticky top-0 z-30 border-b border-white/8 bg-[#05070f]/75 backdrop-blur-2xl">
+    <header className="chrome-top sticky top-0 z-30 border-b backdrop-blur-2xl">
       <div className="mx-auto flex h-14 max-w-[1500px] items-center gap-3 px-4 sm:h-16 sm:px-6 lg:px-8">
-        <Link to="/" className="flex items-center gap-2 lg:hidden" aria-label="HIRO SEGAWA home">
-          <Disc3 className="size-5 text-[var(--accent)]" aria-hidden />
-          <span className="font-display text-[17px] tracking-wide text-white">HIRO SEGAWA</span>
+        <Link to="/" className="lg:hidden" aria-label="HIRO SEGAWA home">
+          <SakuraLogo compact />
         </Link>
 
         <Link

@@ -21,6 +21,14 @@ const COVERS = {
 
 export const ART = COVERS;
 
+/** Sakura Dream key art, generated for this project. */
+export const SAKURA_ART = {
+  hero: asset('/art/sakura-hero.jpg'),
+  splash: asset('/art/sakura-splash.jpg'),
+  explore: asset('/art/sakura-explore.jpg'),
+  fox: asset('/art/sakura-fox.png'),
+} as const;
+
 export const DEMO_TRACKS: Track[] = [
   {
     id: 'neon-requiem',
@@ -474,7 +482,7 @@ export const FEATURED_TRACK_ID = 'neon-requiem';
 export const FEATURED_ALBUM_ID = 'al-neon-requiem';
 export const ARTIST_PORTRAIT = COVERS.portrait;
 export const WIDE_STREET_ART = COVERS.street;
-export const HERO_ART = COVERS.hero;
+export const HERO_ART = SAKURA_ART.hero;
 
 export const MOOD_BY_ID: Record<MoodId, Mood> = Object.fromEntries(
   MOODS.map((m) => [m.id, m]),

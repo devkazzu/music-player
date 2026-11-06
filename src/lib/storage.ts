@@ -1,4 +1,13 @@
-import type { AccentId, MotionPreference, PersistedQueue, RepeatMode, Settings, VisualizerStyle } from '@/types';
+import type {
+  MotionPreference,
+  PerformanceMode,
+  PersistedQueue,
+  RepeatMode,
+  SakuraIntensity,
+  Settings,
+  ThemeId,
+  VisualizerStyle,
+} from '@/types';
 import { clamp } from './utils';
 
 const SETTINGS_KEY = 'hiro:settings:v1';
@@ -13,12 +22,17 @@ export const DEFAULT_SETTINGS: Settings = {
   shuffle: false,
   repeat: 'all',
   rate: 1,
-  accent: 'cyan',
+  theme: 'sakura',
   motion: 'system',
   visualizer: true,
   visualizerStyle: 'bars',
   showQueue: false,
   resumeLastTrack: true,
+  sakura: true,
+  sakuraIntensity: 'normal',
+  backgroundAnimation: true,
+  glow: 1,
+  performanceMode: 'auto',
 };
 
 function readJSON<T>(key: string): T | null {
@@ -39,34 +53,77 @@ function writeJSON(key: string, value: unknown): void {
   }
 }
 
-const ACCENTS: AccentId[] = ['cyan', 'violet', 'sakura', 'gold'];
+const THEME_IDS: ThemeId[] = [
+  'sakura',
+  'moonlight',
+  'cyber',
+  'aqua',
+  'sunset',
+  'midnight',
+  'koi',
+  'emerald',
+];
 const MOTIONS: MotionPreference[] = ['system', 'reduced', 'full'];
 const REPEATS: RepeatMode[] = ['off', 'all', 'one'];
-const STYLES: VisualizerStyle[] = ['bars', 'wave', 'aurora'];
+const STYLES: VisualizerStyle[] = ['bars', 'wave', 'aura'];
+const SAKURA_LEVELS: SakuraIntensity[] = ['gentle', 'normal', 'heavy'];
+const PERFORMANCE_MODES: PerformanceMode[] = ['auto', 'quality', 'battery'];
+
+/** Settings written before the Sakura Dream release used an `accent` key. */
+type LegacySettings = Partial<Omit<Settings, 'visualizerStyle'>> & { accent?: string; visualizerStyle?: string };
+
+function migrateTheme(stored: LegacySettings): ThemeId {
+  if (stored.theme && THEME_IDS.includes(stored.theme)) return stored.theme;
+  switch (stored.accent) {
+    case 'violet':
+      return 'cyber';
+    case 'gold':
+      return 'sunset';
+    case 'sakura':
+      return 'sakura';
+    case 'cyan':
+      return 'moonlight';
+    default:
+      return DEFAULT_SETTINGS.theme;
+  }
+}
 
 export function loadSettings(): Settings {
-  const stored = readJSON<Partial<Settings>>(SETTINGS_KEY);
+  const stored = readJSON<LegacySettings>(SETTINGS_KEY);
   if (!stored) return { ...DEFAULT_SETTINGS };
+  const style = stored.visualizerStyle === 'aurora' ? 'aura' : stored.visualizerStyle;
   return {
     volume: clamp(typeof stored.volume === 'number' ? stored.volume : DEFAULT_SETTINGS.volume, 0, 1),
     muted: typeof stored.muted === 'boolean' ? stored.muted : DEFAULT_SETTINGS.muted,
     shuffle: typeof stored.shuffle === 'boolean' ? stored.shuffle : DEFAULT_SETTINGS.shuffle,
     repeat: REPEATS.includes(stored.repeat as RepeatMode) ? (stored.repeat as RepeatMode) : DEFAULT_SETTINGS.repeat,
     rate: clamp(typeof stored.rate === 'number' ? stored.rate : DEFAULT_SETTINGS.rate, 0.5, 2),
-    accent: ACCENTS.includes(stored.accent as AccentId) ? (stored.accent as AccentId) : DEFAULT_SETTINGS.accent,
+    theme: migrateTheme(stored),
     motion: MOTIONS.includes(stored.motion as MotionPreference)
       ? (stored.motion as MotionPreference)
       : DEFAULT_SETTINGS.motion,
     visualizer:
       typeof stored.visualizer === 'boolean' ? stored.visualizer : DEFAULT_SETTINGS.visualizer,
-    visualizerStyle: STYLES.includes(stored.visualizerStyle as VisualizerStyle)
-      ? (stored.visualizerStyle as VisualizerStyle)
+    visualizerStyle: STYLES.includes(style as VisualizerStyle)
+      ? (style as VisualizerStyle)
       : DEFAULT_SETTINGS.visualizerStyle,
     showQueue: typeof stored.showQueue === 'boolean' ? stored.showQueue : DEFAULT_SETTINGS.showQueue,
     resumeLastTrack:
       typeof stored.resumeLastTrack === 'boolean'
         ? stored.resumeLastTrack
         : DEFAULT_SETTINGS.resumeLastTrack,
+    sakura: typeof stored.sakura === 'boolean' ? stored.sakura : DEFAULT_SETTINGS.sakura,
+    sakuraIntensity: SAKURA_LEVELS.includes(stored.sakuraIntensity as SakuraIntensity)
+      ? (stored.sakuraIntensity as SakuraIntensity)
+      : DEFAULT_SETTINGS.sakuraIntensity,
+    backgroundAnimation:
+      typeof stored.backgroundAnimation === 'boolean'
+        ? stored.backgroundAnimation
+        : DEFAULT_SETTINGS.backgroundAnimation,
+    glow: clamp(typeof stored.glow === 'number' ? stored.glow : DEFAULT_SETTINGS.glow, 0.4, 1.6),
+    performanceMode: PERFORMANCE_MODES.includes(stored.performanceMode as PerformanceMode)
+      ? (stored.performanceMode as PerformanceMode)
+      : DEFAULT_SETTINGS.performanceMode,
   };
 }
 

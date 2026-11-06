@@ -27,6 +27,8 @@ import { PlayerProvider } from '@/state/PlayerProvider';
 import { PlaylistPickerProvider } from '@/state/PlaylistPickerProvider';
 import { FocusTimerProvider } from '@/state/FocusTimerProvider';
 import { hasEntered, markEntered } from '@/lib/storage';
+import { CinematicBackdrop } from '@/components/atmosphere/CinematicBackdrop';
+import { SakuraField } from '@/components/atmosphere/SakuraField';
 
 /** Shows the cinematic intro on a fresh session, and on demand from Settings. */
 function SplashGate({ children }: { children: ReactNode }) {
@@ -59,6 +61,9 @@ export function App() {
           <PlayerProvider>
             <PlaylistPickerProvider>
               <FocusTimerProvider>
+                {/* Mounted above the router so petals and the night scene never reset on navigation. */}
+                <CinematicBackdrop />
+                <SakuraField />
                 <BrowserRouter basename={ROUTER_BASENAME}>
                   <ErrorBoundary>
                     <SplashGate>

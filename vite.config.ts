@@ -18,14 +18,14 @@ export default defineConfig({
     tailwindcss(),
     VitePWA({
       registerType: 'autoUpdate',
-      includeAssets: ['favicon.svg', 'icons/*.png', 'art/*.jpg'],
+      includeAssets: ['favicon.svg', 'icons/*.png', 'art/*.jpg', 'art/*.png'],
       manifest: {
-        name: 'HIRO SEGAWA — Cinematic Anime Music',
+        name: 'HIRO SEGAWA — Sakura Dream',
         short_name: 'HIRO SEGAWA',
         description:
-          'A cinematic anime music player with original soundtracks, a real audio engine, and an offline local library.',
-        theme_color: '#05060f',
-        background_color: '#05060f',
+          'A Sakura Dream anime music player: falling cherry blossoms, eight cinematic themes, a real audio engine and an offline local library.',
+        theme_color: '#0B0714',
+        background_color: '#0B0714',
         display: 'standalone',
         orientation: 'portrait-primary',
         scope,

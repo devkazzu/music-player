@@ -6,7 +6,7 @@ import { useSettings } from '@/state/SettingsProvider';
 
 interface VisualizerProps {
   className?: string;
-  variant?: 'bars' | 'wave' | 'aurora';
+  variant?: 'bars' | 'wave' | 'aura';
   /** Decorative usage in the player bar — smaller, calmer. */
   compact?: boolean;
 }
@@ -155,25 +155,103 @@ export function Visualizer({ className, variant = 'bars', compact = false }: Vis
       context.shadowBlur = 0;
     };
 
-    const drawAurora = (values: Float32Array<ArrayBuffer>, time: number) => {
+    /**
+     * Circular anime aura: a ring of frequency bars, a slow rotating halo and a
+     * glowing kitsune-ear silhouette whose brightness follows the low end.
+     * Everything is driven by the analyser data passed in from the engine.
+     */
+    const drawAura = (values: Float32Array<ArrayBuffer>, time: number) => {
       context.clearRect(0, 0, width, height);
-      const blobs = compact ? 3 : 5;
-      for (let i = 0; i < blobs; i += 1) {
-        const energy = values[Math.floor((i / blobs) * values.length)] ?? 0.2;
-        const x = width * (0.15 + 0.7 * ((i + 0.5) / blobs)) + Math.sin(time * 0.4 + i) * width * 0.05;
-        const y = height * (0.62 - energy * 0.28) + Math.cos(time * 0.5 + i * 1.7) * height * 0.1;
-        const radius = (compact ? 26 : 70) + energy * (compact ? 34 : 110);
-        const gradient = context.createRadialGradient(x, y, 0, x, y, radius);
-        const color = i % 3 === 0 ? accent : i % 3 === 1 ? accent2 : accent3;
-        gradient.addColorStop(0, color);
-        gradient.addColorStop(1, 'rgba(4,5,12,0)');
-        context.globalAlpha = 0.16 + energy * 0.3;
-        context.fillStyle = gradient;
+      const cx = width / 2;
+      const cy = height / 2;
+      const base = Math.min(width, height);
+      const radius = base * (compact ? 0.3 : 0.28);
+      const lowEnd = values.slice(0, Math.max(4, Math.floor(values.length * 0.18))).reduce((sum, v) => sum + v, 0) /
+        Math.max(1, Math.floor(values.length * 0.18));
+
+      // Breathing halo behind the ring.
+      const halo = context.createRadialGradient(cx, cy, radius * 0.2, cx, cy, radius * 1.7);
+      halo.addColorStop(0, `${accent}44`);
+      halo.addColorStop(0.55, `${accent2}22`);
+      halo.addColorStop(1, 'rgba(0,0,0,0)');
+      context.fillStyle = halo;
+      context.beginPath();
+      context.arc(cx, cy, radius * 1.7, 0, Math.PI * 2);
+      context.fill();
+
+      // Fox ears (kitsune silhouette) glowing with the bass energy.
+      const earScale = radius * 1.25;
+      const earLift = radius * (0.62 + lowEnd * 0.12);
+      for (const direction of [-1, 1]) {
+        const earX = cx + direction * radius * 0.52;
+        const earY = cy - earLift;
+        context.save();
+        context.translate(earX, earY);
         context.beginPath();
-        context.arc(x, y, radius, 0, Math.PI * 2);
+        context.moveTo(-radius * 0.24, radius * 0.34);
+        context.quadraticCurveTo(-radius * 0.08, -radius * 0.16, direction * radius * 0.02, -earScale * 0.42);
+        context.quadraticCurveTo(radius * 0.1, -radius * 0.02, radius * 0.26, radius * 0.34);
+        context.closePath();
+        const earFill = context.createLinearGradient(0, -earScale, 0, radius * 0.4);
+        earFill.addColorStop(0, `${accent}cc`);
+        earFill.addColorStop(1, `${accent3}22`);
+        context.fillStyle = earFill;
+        context.shadowBlur = 24;
+        context.shadowColor = accent;
+        context.globalAlpha = 0.5 + lowEnd * 0.5;
         context.fill();
+        context.restore();
       }
       context.globalAlpha = 1;
+      context.shadowBlur = 0;
+
+      // Ring of radial bars.
+      const segments = compact ? 40 : 84;
+      for (let i = 0; i < segments; i += 1) {
+        const angle = (i / segments) * Math.PI * 2 - Math.PI / 2;
+        const value = values[Math.floor((i / segments) * values.length)] ?? 0;
+        const length = base * 0.05 + value * base * (compact ? 0.13 : 0.2);
+        const inner = radius;
+        context.save();
+        context.translate(cx, cy);
+        context.rotate(angle);
+        const barGradient = context.createLinearGradient(inner, 0, inner + length, 0);
+        barGradient.addColorStop(0, accent);
+        barGradient.addColorStop(1, accent2);
+        context.strokeStyle = barGradient;
+        context.lineWidth = Math.max(1.6, (Math.PI * radius * 2) / segments * 0.42);
+        context.lineCap = 'round';
+        context.shadowBlur = 14;
+        context.shadowColor = accent;
+        context.globalAlpha = 0.45 + value * 0.55;
+        context.beginPath();
+        context.moveTo(inner, 0);
+        context.lineTo(inner + length, 0);
+        context.stroke();
+        context.restore();
+      }
+      context.globalAlpha = 1;
+      context.shadowBlur = 0;
+
+      // Rotating shimmer arc.
+      const sweep = time * 0.5;
+      context.strokeStyle = `${accent}99`;
+      context.lineWidth = 1.4;
+      context.beginPath();
+      context.arc(cx, cy, radius * 0.9, sweep, sweep + Math.PI * 0.8);
+      context.stroke();
+      context.beginPath();
+      context.arc(cx, cy, radius * 0.9, sweep + Math.PI, sweep + Math.PI * 1.5);
+      context.stroke();
+
+      // Core disk.
+      const core = context.createRadialGradient(cx, cy, 0, cx, cy, radius * 0.58);
+      core.addColorStop(0, `${accent}30`);
+      core.addColorStop(1, 'rgba(0,0,0,0)');
+      context.fillStyle = core;
+      context.beginPath();
+      context.arc(cx, cy, radius * 0.58, 0, Math.PI * 2);
+      context.fill();
     };
 
     const render = (now: number) => {
@@ -204,7 +282,7 @@ export function Visualizer({ className, variant = 'bars', compact = false }: Vis
       }
 
       if (variant === 'wave') drawWave(smooth, time);
-      else if (variant === 'aurora') drawAurora(smooth, time);
+      else if (variant === 'aura') drawAura(smooth, time);
       else drawBars(smooth, time);
     };
 
@@ -213,7 +291,7 @@ export function Visualizer({ className, variant = 'bars', compact = false }: Vis
       if (!smooth) smooth = new Float32Array(barCount) as Float32Array<ArrayBuffer>;
       for (let i = 0; i < barCount; i += 1) smooth[i] = ambientValue(i, 0) * 0.5;
       if (variant === 'wave') drawWave(smooth, 0);
-      else if (variant === 'aurora') drawAurora(smooth, 0);
+      else if (variant === 'aura') drawAura(smooth, 0);
       else drawBars(smooth, 0);
     } else {
       frame = requestAnimationFrame(render);

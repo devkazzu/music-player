@@ -105,4 +105,37 @@ describe('HIRO SEGAWA application shell', () => {
     expect(await screen.findByRole('heading', { name: 'Test Night Mix' })).toBeTruthy();
     expect(await screen.findByText('This playlist is empty')).toBeTruthy();
   }, 25000);
+
+  it('applies and persists Sakura Dream themes and atmosphere settings', async () => {
+    window.sessionStorage.setItem('hiro:splash-entered:v1', '1');
+    window.history.replaceState({}, '', '/settings');
+    render(<App />);
+
+    // Defaults come from the Sakura Night palette.
+    await waitFor(() => expect(document.documentElement.dataset.theme).toBe('sakura'));
+
+    fireEvent.click(await screen.findByRole('button', { name: /Moonlight/i }));
+    await waitFor(() => expect(document.documentElement.dataset.theme).toBe('moonlight'));
+    expect(document.documentElement.style.getPropertyValue('--accent')).toBe('#BFE6FF');
+
+    const stored = JSON.parse(window.localStorage.getItem('hiro:settings:v1') ?? '{}');
+    expect(stored.theme).toBe('moonlight');
+
+    // Sakura effects and background motion can be switched off.
+    fireEvent.click(screen.getByRole('switch', { name: 'Sakura petals' }));
+    await waitFor(() => {
+      const next = JSON.parse(window.localStorage.getItem('hiro:settings:v1') ?? '{}');
+      expect(next.sakura).toBe(false);
+    });
+
+    fireEvent.click(screen.getByRole('switch', { name: 'Background animation' }));
+    await waitFor(() => expect(document.documentElement.dataset.animations).toBe('off'));
+
+    // The aura visualizer is selectable from the same screen.
+    fireEvent.click(screen.getByRole('radio', { name: 'Aura' }));
+    await waitFor(() => {
+      const next = JSON.parse(window.localStorage.getItem('hiro:settings:v1') ?? '{}');
+      expect(next.visualizerStyle).toBe('aura');
+    });
+  }, 25000);
 });

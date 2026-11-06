@@ -1,9 +1,13 @@
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
-import '@fontsource-variable/inter';
-import '@fontsource/cormorant-garamond/300.css';
-import '@fontsource/cormorant-garamond/400.css';
-import '@fontsource/cormorant-garamond/500.css';
+import '@fontsource/manrope/400.css';
+import '@fontsource/manrope/500.css';
+import '@fontsource/manrope/600.css';
+import '@fontsource/manrope/700.css';
+import '@fontsource/poppins/600.css';
+import '@fontsource/poppins/700.css';
+import '@fontsource/quicksand/500.css';
+import '@fontsource/quicksand/600.css';
 import './styles/index.css';
 import { App } from './App';
 import { restoreDeepLink } from '@/lib/deepLink';
