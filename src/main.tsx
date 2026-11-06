@@ -19,7 +19,14 @@ createRoot(container).render(
   </StrictMode>,
 );
 
-if (import.meta.env.PROD && 'serviceWorker' in navigator) {
+// The service worker is skipped in native (Capacitor) builds: the bundle is
+// shipped inside the app and a cached shell would go stale after updates.
+const serviceWorkerEnabled =
+  import.meta.env.PROD &&
+  import.meta.env.VITE_DISABLE_SW !== '1' &&
+  'serviceWorker' in navigator;
+
+if (serviceWorkerEnabled) {
   void import('virtual:pwa-register').then(({ registerSW }) => {
     registerSW({
       immediate: true,

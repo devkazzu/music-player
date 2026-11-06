@@ -20,6 +20,7 @@ import { PlayButton } from '@/components/ui/PlayButton';
 import { SectionHeader } from '@/components/ui/SectionHeader';
 import { TrackList } from '@/components/music/TrackList';
 import { useLibrary } from '@/state/LibraryProvider';
+import { ART } from '@/data/catalog';
 import { usePlayer } from '@/state/PlayerProvider';
 import { usePageTitle } from '@/hooks/usePageTitle';
 import { loadRecentSearches, saveRecentSearches } from '@/lib/storage';
@@ -233,9 +234,9 @@ export function SearchPage() {
             <SectionHeader eyebrow="Or explore" title="Mood doorways" action={{ label: 'Explore', to: '/explore' }} />
             <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
               {[
-                { label: 'Rainy Focus', to: '/explore?mood=rainy-focus', art: '/art/rainfall-sonata.jpg' },
-                { label: 'Night Drive', to: '/explore?mood=night-drive', art: '/art/neon-requiem.jpg' },
-                { label: 'Golden Hour', to: '/explore?mood=golden-hour', art: '/art/paper-lanterns.jpg' },
+                { label: 'Rainy Focus', to: '/explore?mood=rainy-focus', art: ART.rain },
+                { label: 'Night Drive', to: '/explore?mood=night-drive', art: ART.neon },
+                { label: 'Golden Hour', to: '/explore?mood=golden-hour', art: ART.lanterns },
               ].map((item) => (
                 <Link
                   key={item.label}

@@ -2,6 +2,7 @@ import { Link, useLocation } from 'react-router-dom';
 import { Download, Search, Disc3, Settings2 } from 'lucide-react';
 import { Cover } from '@/components/ui/Cover';
 import { useLibrary } from '@/state/LibraryProvider';
+import { asset } from '@/lib/assets';
 import { useInstallPrompt } from '@/hooks/useInstallPrompt';
 import { useUI } from '@/state/UIContext';
 
@@ -66,7 +67,7 @@ export function TopBar() {
             aria-label="Open profile"
           >
             <Cover
-              src={profile.avatar}
+              src={asset(profile.avatar)}
               alt=""
               className="size-7"
               rounded="rounded-full"

@@ -35,6 +35,11 @@ npm test           # vitest run — 58 tests, 8 files
 npm run test:watch # watch mode
 npm run lint       # tsc -b --force (full re-check)
 npm run gen:audio  # regenerate the demo MP3s (deterministic)
+
+# deployment / packaging
+npm run check:pwa    # audit the built dist/ for PWA installability
+npm run build:pages  # build with VITE_BASE=/music-player/ for GitHub Pages
+npm run build:android # build without the service worker for Capacitor
 ```
 
 Node 18+ is recommended. `npm run dev` / `build` / `preview` / `test` need no environment
@@ -146,7 +151,13 @@ music-player/
 │  ├─ icons/                    PWA icons
 │  ├─ audio/manifest.json        demo track metadata
 │  └─ favicon.svg
-├─ scripts/generate-audio.mjs   deterministic demo-score synthesiser → MP3
+├─ .github/workflows/           CI (typecheck + tests + build) and Pages deploy
+├─ docs/                        DEPLOYMENT.md, PWA-VERIFICATION.md, ANDROID.md
+├─ capacitor.config.json        Android/iOS packaging config (Capacitor)
+├─ vercel.json                  SPA rewrites + asset headers for Vercel
+├─ scripts/
+│  ├─ generate-audio.mjs        deterministic demo-score synthesiser → MP3
+│  └─ check-pwa.mjs             manifest / icon / service-worker audit of dist/
 ├─ src/
 │  ├─ audio/engine.ts           HTMLAudioElement + Web Audio graph + subscriptions
 │  ├─ components/
@@ -198,9 +209,9 @@ Clearing site data resets the app; Settings offers explicit reset/erase actions 
 npm test
 ```
 
-58 tests across 8 files run in jsdom with `fake-indexeddb` and stubbed media APIs:
+62 tests across 8 files run in jsdom with `fake-indexeddb` and stubbed media APIs:
 
-- `tests/utils.test.ts` — formatting, slugify, clamping, uid
+- `tests/utils.test.ts` — formatting, slugify, clamping, uid, base-path asset resolution
 - `tests/sorting.test.ts` — title/artist/recent sorters
 - `tests/search.test.ts` — weighted search, entity filtering, empty and no-result cases
 - `tests/metadata.test.ts` — metadata parsing paths and format detection
@@ -238,6 +249,44 @@ toast appears once caching completes. Install from the browser menu (or the in-a
 prompt) for a standalone window.
 
 ---
+
+## Deployment
+
+The build is a fully static `dist/`. `npm run check:pwa` audits it for installability before you
+ship, and `VITE_BASE` makes sub-path hosting work end to end.
+
+**Recommended free host: Cloudflare Pages** — unlimited bandwidth, global CDN, free HTTPS, PR
+previews and root-domain hosting (cleanest PWA scope). Build command `npm run build`, output
+`dist`, Node 22. Netlify (uses the bundled `_redirects`) and Vercel (uses `vercel.json`) are
+equally straightforward. **GitHub Pages is supported** by
+`.github/workflows/deploy-pages.yml`, which builds with `VITE_BASE=/<repo>/`; GitHub Pages was the
+only option needing extra configuration, and its sub-path deployment was verified locally.
+
+Full details, the post-deploy checklist, update/rollback notes and the hosting comparison live in
+[`docs/DEPLOYMENT.md`](docs/DEPLOYMENT.md).
+
+## Installing on Android
+
+The app installs as a PWA: open the deployed HTTPS URL in Chrome → menu → **Install app** (or use
+the in-app install button). `npm run check:pwa` verifies the manifest, 192/512/maskable icons and
+the precached shell; device steps and known platform limits are in
+[`docs/PWA-VERIFICATION.md`](docs/PWA-VERIFICATION.md).
+
+## Packaging as an Android APK
+
+Capacitor is preconfigured (`capacitor.config.json`, app id `com.hirosegawa.player`,
+`webDir: dist`). Short version:
+
+```bash
+npm install @capacitor/core @capacitor/android
+npm install --save-dev @capacitor/cli
+npx cap add android
+npm run build:android && npx cap sync android
+cd android && ./gradlew assembleDebug   # → app/build/outputs/apk/debug/app-debug.apk
+```
+
+Signing, AAB builds, icons/splash, background-playback caveats and troubleshooting are covered in
+[`docs/ANDROID.md`](docs/ANDROID.md).
 
 ## Browser support
 

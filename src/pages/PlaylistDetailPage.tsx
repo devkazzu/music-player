@@ -19,6 +19,7 @@ import { PlaylistCover } from '@/components/cards/Cards';
 import { PlaylistDialog } from '@/components/ui/PlaylistDialog';
 import { TrackList } from '@/components/music/TrackList';
 import { useLibrary } from '@/state/LibraryProvider';
+import { ART } from '@/data/catalog';
 import { usePlayer } from '@/state/PlayerProvider';
 import { useUI } from '@/state/UIContext';
 import { usePageTitle } from '@/hooks/usePageTitle';
@@ -66,7 +67,7 @@ export function PlaylistDetailPage() {
     <div>
       <section className="relative mb-7 overflow-hidden rounded-3xl border border-white/10">
         <img
-          src={playlistTracks[0]?.cover ?? '/art/rainy-street-wide.jpg'}
+          src={playlistTracks[0]?.cover ?? ART.street}
           alt=""
           className="absolute inset-0 size-full scale-110 object-cover blur-2xl opacity-40"
         />

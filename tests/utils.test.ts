@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { resolveAssetPath } from '@/lib/assets';
 import {
   clamp,
   formatBytes,
@@ -73,5 +74,36 @@ describe('misc helpers', () => {
   it('slugifies playlist names', () => {
     expect(slugify('Rainy Night Drive!')).toBe('rainy-night-drive');
     expect(slugify('   ')).toBe('untitled');
+  });
+});
+
+describe('asset path resolution', () => {
+  it('keeps root deployments at the domain root', () => {
+    expect(resolveAssetPath('/art/neon-requiem.jpg', '/')).toBe('/art/neon-requiem.jpg');
+    expect(resolveAssetPath('art/neon-requiem.jpg', '/')).toBe('/art/neon-requiem.jpg');
+  });
+
+  it('prefixes GitHub Pages project subpaths', () => {
+    expect(resolveAssetPath('/art/neon-requiem.jpg', '/music-player/')).toBe(
+      '/music-player/art/neon-requiem.jpg',
+    );
+    expect(resolveAssetPath('/audio/neon-requiem.mp3', '/music-player')).toBe(
+      '/music-player/audio/neon-requiem.mp3',
+    );
+  });
+
+  it('is idempotent for already-scoped paths', () => {
+    expect(resolveAssetPath('/music-player/art/neon-requiem.jpg', '/music-player/')).toBe(
+      '/music-player/art/neon-requiem.jpg',
+    );
+  });
+
+  it('passes through absolute and object URLs untouched', () => {
+    expect(resolveAssetPath('https://cdn.example.com/cover.jpg', '/music-player/')).toBe(
+      'https://cdn.example.com/cover.jpg',
+    );
+    expect(resolveAssetPath('blob:http://localhost/abc', '/music-player/')).toBe(
+      'blob:http://localhost/abc',
+    );
   });
 });

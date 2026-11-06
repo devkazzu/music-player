@@ -1,5 +1,6 @@
 import { useEffect, useState, type ReactNode } from 'react';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
+import { ROUTER_BASENAME } from '@/lib/assets';
 import { AppShell } from '@/components/layout/AppShell';
 import { ErrorBoundary } from '@/components/ui/ErrorBoundary';
 import { SplashScreen } from '@/pages/SplashScreen';
@@ -58,7 +59,7 @@ export function App() {
           <PlayerProvider>
             <PlaylistPickerProvider>
               <FocusTimerProvider>
-                <BrowserRouter>
+                <BrowserRouter basename={ROUTER_BASENAME}>
                   <ErrorBoundary>
                     <SplashGate>
                       <Routes>

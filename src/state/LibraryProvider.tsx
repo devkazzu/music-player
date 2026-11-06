@@ -20,6 +20,7 @@ import type {
   Track,
   UserProfile,
 } from '@/types';
+import { asset } from '@/lib/assets';
 import { ALBUMS, ARTISTS, DEMO_TRACKS, SEED_PLAYLISTS } from '@/data/catalog';
 import {
   dbAddFavourite,
@@ -55,11 +56,11 @@ import { useUI } from './UIContext';
 const DEFAULT_PROFILE: UserProfile = {
   name: 'Hiro Segawa',
   tagline: 'Night-drive listener · Tokyo',
-  avatar: '/art/hiro-portrait.jpg',
+  avatar: asset('/art/hiro-portrait.jpg'),
   joinedAt: 1_731_000_000_000,
 };
 
-const FALLBACK_COVER = '/art/rainy-street-wide.jpg';
+const FALLBACK_COVER = asset('/art/rainy-street-wide.jpg');
 
 interface UrlEntry {
   audio: string;

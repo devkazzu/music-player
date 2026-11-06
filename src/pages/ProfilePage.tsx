@@ -21,6 +21,7 @@ import { Modal } from '@/components/ui/Modal';
 import { PlayButton } from '@/components/ui/PlayButton';
 import { SectionHeader } from '@/components/ui/SectionHeader';
 import { useLibrary } from '@/state/LibraryProvider';
+import { asset } from '@/lib/assets';
 import { usePageTitle } from '@/hooks/usePageTitle';
 import { formatDate, formatDuration, formatNumber, formatRelativeTime, pluralize } from '@/lib/utils';
 
@@ -76,7 +77,7 @@ export function ProfilePage() {
         <div className="relative flex flex-col items-start gap-5 p-5 sm:flex-row sm:items-center sm:p-8">
           <div className="relative">
             <Cover
-              src={profile.avatar}
+              src={asset(profile.avatar)}
               alt={`${profile.name} avatar`}
               className="size-28 sm:size-32"
               rounded="rounded-full ring-glow"

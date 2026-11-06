@@ -10,3 +10,11 @@ coverage
 !.env.example
 scripts/.cache
 *.tsbuildinfo
+
+# Android / Capacitor
+android/local.properties
+android/.gradle/
+android/app/build/
+android/keystore.properties
+*.keystore
+*.jks
