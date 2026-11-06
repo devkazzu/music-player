@@ -25,6 +25,7 @@ describe('deep-link restoration (static hosts without SPA rewrites)', () => {
     expect(resolveDeepLinkTarget('/music-player/assets/index-abc.js', '/music-player/')).toBeNull();
     expect(resolveDeepLinkTarget('/music-player/audio/neon-requiem.mp3', '/music-player/')).toBeNull();
     expect(resolveDeepLinkTarget('/music-player/sw.js', '/music-player/')).toBeNull();
+    expect(resolveDeepLinkTarget('/music-player/404.html', '/music-player/')).toBeNull();
   });
 
   it('ignores empty input', () => {

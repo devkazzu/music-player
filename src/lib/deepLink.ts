@@ -16,7 +16,9 @@ export function resolveDeepLinkTarget(stored: string | null, base: string): stri
   // GitHub Pages also serves 404.html for missing files; never treat an asset
   // path as a client route.
   if (/^(?:assets|art|audio|icons|fonts)\//.test(rest)) return null;
-  if (rest === 'sw.js' || rest === 'manifest.webmanifest' || rest === 'favicon.svg') return null;
+  if (['sw.js', 'manifest.webmanifest', 'favicon.svg', '404.html', 'index.html'].includes(rest)) {
+    return null;
+  }
 
   return base + rest;
 }
